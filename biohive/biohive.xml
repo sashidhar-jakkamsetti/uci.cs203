@@ -1,0 +1,9 @@
+<baseline>
+    <minutiae_extractor>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/main/resources/minutiae_extractor.py</minutiae_extractor>
+    <tarp_location>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/main/resources/tarp.jar</tarp_location>
+    <mindtct_location>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/main/resources/mindtct</mindtct_location>
+    <fingerprint_raw>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/database/fingerprint_raw/</fingerprint_raw>
+    <fingerprint_aligned>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/database/fingerprint_aligned/</fingerprint_aligned>
+    <minutiae>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/database/minutiae/</minutiae>
+    <fingerprint>101_6.tif</fingerprint>>
+</baseline>
