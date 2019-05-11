@@ -40,7 +40,7 @@ public class BiometricExtractor
         }
 
         Stream<Minutiae> minutiaesSorted = minutiaeHolder.stream().sorted((m1, m2) -> -1 * (m1.cnf.compareTo(m2.cnf)));
-        minutiaesSorted = minutiaesSorted.limit(Constants.CAP_NUMBER_OF_MINUTIAE);
+        minutiaesSorted = minutiaesSorted.limit(Constants.NUMBER_OF_MINUTIAE);
 
         ArrayList<Minutiae> minutiaes = new ArrayList<Minutiae>();
         for (Minutiae m : minutiaesSorted.collect(Collectors.toList())) 

@@ -1,6 +1,7 @@
 package biohive;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import biohive.fuzzyVault.FuzzyVault;
 import biohive.honeywordGeneration.HoneywordGenerator;
@@ -8,6 +9,7 @@ import biohive.minutiaeExtraction.BiometricExtractor;
 import biohive.minutiaeExtraction.Minutiae;
 import biohive.utility.Baseline;
 import biohive.utility.ConfigLoader;
+import biohive.utility.SaveToDatabase;
 
 public class biohive 
 {
@@ -27,6 +29,7 @@ public class biohive
 
             if(BiometricExtractor.extract(execString, bInfo.out_minutiae))
             {
+                TimeUnit.SECONDS.sleep(4);
                 ArrayList<Minutiae> minutiaes = BiometricExtractor.encode(bInfo.out_minutiae + ".xyt");
                 if(minutiaes.size() > 0)
                 {
@@ -36,7 +39,8 @@ public class biohive
                         HoneywordGenerator hGenerator = new HoneywordGenerator(sugarVault);
                         if(hGenerator.generate())
                         {
-                            
+                            SaveToDatabase.saveHoneyVaults(bInfo.userid, hGenerator.getHoneyVaults(), bInfo.out_biodb);
+                            SaveToDatabase.saveHoneyChecker(bInfo.userid, hGenerator.getHoneyChecker(), bInfo.out_honeydb);
                         }
                     }
                 }
