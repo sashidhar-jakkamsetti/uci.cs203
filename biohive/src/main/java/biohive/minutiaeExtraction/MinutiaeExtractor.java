@@ -1,35 +1,33 @@
 package biohive.minutiaeExtraction;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import biohive.utility.Baseline;
 import biohive.utility.Constants;
 
-public class BiometricExtractor
+public class MinutiaeExtractor
 {
-    public static Boolean extract(String execString, String minutiaeFile) throws Exception
+    public static Boolean extract(Baseline bInfo) throws Exception
     {
-        try 
-        {
-            Process p = Runtime.getRuntime().exec(execString);
-        }
-        catch(Exception e)
-        {
-            throw new Exception(e);
-        }
-
+        String execString = String.format("python %s %s %s %s %s %s", 
+                    bInfo.getMinutiae_extractor(), 
+                    bInfo.getTarp_location(), 
+                    bInfo.getMindtct_location(),
+                    bInfo.in_fingerprint,
+                    bInfo.out_fingerprintAligned,
+                    bInfo.out_minutiae
+                    );
+        Runtime.getRuntime().exec(execString);
         return true;
     }
 
     public static ArrayList<Minutiae> encode(String minutiaeFileName) throws Exception
     {
-        File minutiaeFile = new File(minutiaeFileName);
-        FileReader fReader = new FileReader(minutiaeFile);
-        BufferedReader bReader = new BufferedReader(fReader);
+        BufferedReader bReader = new BufferedReader(new FileReader(minutiaeFileName));
 
         String line;
         ArrayList<Minutiae> minutiaeHolder = new ArrayList<Minutiae>();
@@ -48,7 +46,8 @@ public class BiometricExtractor
             m.encode();
             minutiaes.add(m);
         }
-
+        
+        bReader.close();
         return minutiaes;
     }
 }

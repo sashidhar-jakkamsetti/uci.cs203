@@ -14,6 +14,11 @@ public class Minutiae
     public Minutiae()
     {}
 
+    public Minutiae(int code)
+    {
+        this.code = code;
+    }
+
     public Minutiae(int x, int y, int o, Integer cnf)
     {
         this.x = x;
@@ -43,7 +48,7 @@ public class Minutiae
         code = code | xShifted << Constants.CAP_BITS_OF_O_MINUTIAE + Constants.CAP_BITS_OF_Y_MINUTIAE;
     }
 
-    // Since we already lossy encoded, it is impossbile to get the true values back. 
+    // Since minutiae are already lossy encoded, it is impossbile to get the true values back. 
     // So reconstructing the values with lower precision in terms of bits.
     public void decode()
     {
@@ -64,5 +69,11 @@ public class Minutiae
             Constants.CAP_BITS_OF_O_MINUTIAE,
             1
             );
+    }
+
+    public double compare(Minutiae m)
+    {
+
+        return 0;
     }
 }

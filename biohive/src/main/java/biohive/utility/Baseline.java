@@ -9,9 +9,10 @@ public class Baseline
     public String in_fingerprint;
     public String out_fingerprintAligned;
     public String out_minutiae;
-    public String out_biodb;
-    public String out_honeydb;
-    public String userid;
+    public String biodb;
+    public String honeydb;
+    public String userId;
+    public boolean mode;
 
     String minutiae_extractor;
     String tarp_location;
@@ -21,6 +22,7 @@ public class Baseline
     String minutiae;
     String database;
     String fingerprint;
+    String action;
 
     public String getMinutiae_extractor() 
     {
@@ -110,15 +112,35 @@ public class Baseline
         this.database = database;
     }
 
+    public String getAction() 
+    {
+        return action;
+    }
+
+    @XmlElement
+    public void setAction(String action) 
+    {
+        this.action = action;
+    }
+
     public void prepareOutputIdentifiers()
     {
         String infileTag = fingerprint.replace(".tif", "").replace(".jpeg", "").replace(".png", "");
 
-        userid = infileTag.split("_")[0];
+        userId = infileTag.split("_")[0];
         in_fingerprint = String.format("%s/%s", fingerprint_raw, fingerprint);
         out_minutiae = String.format("%s/%s", minutiae, infileTag);
         out_fingerprintAligned = String.format("%s/%s.aligned.jpeg", fingerprint_aligned, infileTag);
-        out_biodb = String.format("%s/%s", database, Constants.DATABASE_BIO_FILENAME);
-        out_honeydb = String.format("%s/%s", database, Constants.DATABASE_HONEY_FILENAME);
+        biodb = String.format("%s/%s", database, Constants.DATABASE_BIO_FILENAME);
+        honeydb = String.format("%s/%s", database, Constants.DATABASE_HONEY_FILENAME);
+
+        if(action == Constants.ACTION_REGISTER)
+        {
+            mode = true;
+        }
+        else
+        {
+            mode = false;
+        }
     }
 }

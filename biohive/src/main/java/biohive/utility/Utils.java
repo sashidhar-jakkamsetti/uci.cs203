@@ -1,9 +1,12 @@
 package biohive.utility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.MD2Digest;
+
+import biohive.fuzzyVault.Tuple;
 
 public class Utils
 {
@@ -48,5 +51,15 @@ public class Utils
         result = result << 8 | byteArray[0];
 
         return result;
+    }
+
+    public static HashMap<Integer, Integer> convertToMap(ArrayList<Tuple<Integer, Integer>> list)
+    {
+        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+        for (Tuple<Integer, Integer> item : list) 
+        {
+            map.put(item.x, item.y);
+        }  
+        return map;
     }
 }

@@ -1,15 +1,14 @@
 package biohive;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import biohive.fuzzyVault.FuzzyVault;
+import biohive.authentication.Authenticator;
+import biohive.fuzzyVault.*;
 import biohive.honeywordGeneration.HoneywordGenerator;
-import biohive.minutiaeExtraction.BiometricExtractor;
-import biohive.minutiaeExtraction.Minutiae;
-import biohive.utility.Baseline;
-import biohive.utility.ConfigLoader;
-import biohive.utility.SaveToDatabase;
+import biohive.minutiaeExtraction.*;
+import biohive.utility.*;
 
 public class biohive 
 {
@@ -17,36 +16,53 @@ public class biohive
     {
         try 
         {
-            String execString = String.format("python %s %s %s %s %s %s", 
-                                                bInfo.getMinutiae_extractor(), 
-                                                bInfo.getTarp_location(), 
-                                                bInfo.getMindtct_location(),
-                                                bInfo.in_fingerprint,
-                                                bInfo.out_fingerprintAligned,
-                                                bInfo.out_minutiae);
+            System.out.println("Extracting minutiae from fingerprint image.");
+            String targetFileName = bInfo.out_minutiae + ".xyt";
+            File targetFile = new File(targetFileName);
 
-            System.out.println("Extracting minutiae from fingerprint image....");
-
-            if(BiometricExtractor.extract(execString, bInfo.out_minutiae))
+            if(!targetFile.exists())
             {
+                MinutiaeExtractor.extract(bInfo);
                 TimeUnit.SECONDS.sleep(4);
-                ArrayList<Minutiae> minutiaes = BiometricExtractor.encode(bInfo.out_minutiae + ".xyt");
+            }
+
+            if(targetFile.exists())
+            {
+                System.out.println("Encoding minutiae.");
+                ArrayList<Minutiae> minutiaes = MinutiaeExtractor.encode(targetFileName);
                 if(minutiaes.size() > 0)
                 {
-                    FuzzyVault sugarVault = new FuzzyVault(minutiaes);
-                    if(sugarVault.create())
+                    if(bInfo.mode)
                     {
-                        HoneywordGenerator hGenerator = new HoneywordGenerator(sugarVault);
-                        if(hGenerator.generate())
+                        System.out.println("Generating honey vaults.");
+                        FuzzyVault sugarVault = new FuzzyVault(minutiaes);
+                        if(sugarVault.create())
                         {
-                            SaveToDatabase.saveHoneyVaults(bInfo.userid, hGenerator.getHoneyVaults(), bInfo.out_biodb);
-                            SaveToDatabase.saveHoneyChecker(bInfo.userid, hGenerator.getHoneyChecker(), bInfo.out_honeydb);
+                            HoneywordGenerator hGenerator = new HoneywordGenerator(sugarVault);
+                            if(hGenerator.generate())
+                            {
+                                System.out.println("Registering the vaults with userId: " + bInfo.userId);
+                                DatabaseIO.setHoneyVaults(bInfo.userId, hGenerator.getHoneyVaults(), bInfo.biodb);
+                                DatabaseIO.setHoneyChecker(bInfo.userId, hGenerator.getHoneyChecker(), bInfo.honeydb);
+                                return true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        System.out.println("Quering minutiae with userId: " + bInfo.userId);
+                        ArrayList<ArrayList<Tuple<Integer, Integer>>> hVaults = DatabaseIO.getHoneyVaults(bInfo.userId, bInfo.biodb);
+
+                        if(hVaults.size() == Constants.NUMBER_OF_HONEY_WORDS + 1)
+                        {
+                            Authenticator authenticator = new Authenticator(bInfo.userId, hVaults, bInfo.honeydb);
+                            return authenticator.authenticate(minutiaes);
                         }
                     }
                 }
             }
 
-            return true;
+            return false;
         } 
         catch (Exception e) 
         {
@@ -86,7 +102,14 @@ public class biohive
 
         if(run(baselineInfo))
         {
-            System.out.println("Biometric successfully saved!");
+            if(baselineInfo.mode)
+            {
+                System.out.println("Biometric successfully registerd!");
+            }
+            else
+            {
+                System.out.println("Biometric successfully authenticated!");
+            }
         }
         else
         {
