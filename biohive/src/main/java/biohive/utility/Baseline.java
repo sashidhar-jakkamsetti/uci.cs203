@@ -134,7 +134,7 @@ public class Baseline
         biodb = String.format("%s/%s", database, Constants.DATABASE_BIO_FILENAME);
         honeydb = String.format("%s/%s", database, Constants.DATABASE_HONEY_FILENAME);
 
-        if(action == Constants.ACTION_REGISTER)
+        if(action.equals(Constants.ACTION_REGISTER))
         {
             mode = true;
         }
