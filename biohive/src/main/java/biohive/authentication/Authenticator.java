@@ -1,10 +1,11 @@
 package biohive.authentication;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import biohive.fuzzyVault.*;
 import biohive.minutiaeExtraction.Minutiae;
+import biohive.utility.Constants;
 import biohive.utility.Utils;
 import biohive.validation.Validator;
 
@@ -53,33 +54,31 @@ public class Authenticator
 
     private boolean isSugarVault(ArrayList<Tuple<Integer, Integer>> vault, ArrayList<Minutiae> minutiaes)
     {
-        HashMap<Integer, Integer> vaultMap = Utils.convertToMap(vault);
-        HashMap<Integer, Tuple<Integer, Double>> catalouge = buildCatalouge(minutiaes, vaultMap);
-        
-
-        return true;
-    }
-
-    private HashMap<Integer, Tuple<Integer, Double>> buildCatalouge(ArrayList<Minutiae> minutiaes, HashMap<Integer, Integer> vaultMap)
-    {
-        HashMap<Integer, Tuple<Integer, Double>> catalouge = new HashMap<Integer, Tuple<Integer, Double>>();
-        for (Minutiae m : minutiaes) 
+        MinutiaeMatcher mMatcher = new MinutiaeMatcher(vault, minutiaes);
+        mMatcher.initialize();
+        ArrayList<Tuple<Integer, Integer>> selectedVault = new ArrayList<Tuple<Integer, Integer>>();
+        while(mMatcher.getNextSet(selectedVault))
         {
-            Double minScore = 1.0;
-            for (Integer key : vaultMap.keySet()) 
+            ArrayList<Integer> predictedKey = lagrangeInterpolation(selectedVault);
+            if(verifyKey(predictedKey))
             {
-                Minutiae vaultM = new Minutiae(key);
-                vaultM.decode();
-                Double score = m.compare(vaultM);
-
-                if(score < minScore)
-                {
-                    minScore = score;
-                    catalouge.put(m.code, new Tuple<Integer, Double>(key, score));
-                }
+                return true;
             }
         }
 
-        return catalouge;
+        return false;
+    }
+
+    private ArrayList<Integer> lagrangeInterpolation(ArrayList<Tuple<Integer, Integer>> vault)
+    {
+        ArrayList<Integer> key = new ArrayList<Integer>();
+
+        return key;
+    }
+
+    private boolean verifyKey(ArrayList<Integer> key)
+    {
+        return Utils.hashMe(new ArrayList<Integer>(key.stream().limit(Constants.POLY_DEGREE).collect(Collectors.toList()))) == 
+                key.get(Constants.POLY_DEGREE);
     }
 }
