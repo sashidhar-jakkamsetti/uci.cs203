@@ -42,7 +42,7 @@ public class MinutiaeMatcher
             {
                 Minutiae vaultM = new Minutiae(key);
                 vaultM.decode();
-                Double score = m.compare(vaultM);
+                Double score = m.distance(vaultM);
 
                 if(score < minScore)
                 {

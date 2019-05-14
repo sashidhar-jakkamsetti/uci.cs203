@@ -71,9 +71,8 @@ public class Minutiae
             );
     }
 
-    public double compare(Minutiae m)
+    public double distance(Minutiae m)
     {
-
-        return 0;
+        return Math.sqrt((Math.pow((x - m.x), 2) - Math.pow((y - m.y), 2))) + (0.2 * Math.min(Math.abs(o - m.o), 360 - Math.abs(o - m.o)));
     }
 }
