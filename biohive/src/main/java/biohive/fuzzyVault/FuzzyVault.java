@@ -5,8 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import biohive.minutiaeExtraction.Minutiae;
-import biohive.utility.Constants;
-import biohive.utility.Utils;
+import biohive.utility.*;
 import cc.redberry.rings.IntegersZp64;
 
 public class FuzzyVault 
@@ -49,7 +48,7 @@ public class FuzzyVault
         {
             key.add((int)field.randomElement());
         }
-        key.add(Utils.hashMe(key));
+        key.add((int)field.modulus(Utils.hashMe(key)));
 
         return key;
     }

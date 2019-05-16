@@ -2,21 +2,24 @@ package biohive.authentication;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.math.BigInteger;
 
 import biohive.fuzzyVault.*;
 import biohive.minutiaeExtraction.Minutiae;
-import biohive.utility.Constants;
-import biohive.utility.Utils;
+import biohive.utility.*;
 import biohive.validation.Validator;
+import cc.redberry.rings.IntegersZp64;
 
 public class Authenticator
 {
     private ArrayList<ArrayList<Tuple<Integer, Integer>>> hVaults;
     private String userId;
     private String honeydb;
+    private IntegersZp64 field;
 
     public Authenticator(String userId, ArrayList<ArrayList<Tuple<Integer, Integer>>> hVaults, String honeydb)
     {
+        field = new IntegersZp64(Constants.FIELD_ORDER_16);
         this.userId = userId;
         this.hVaults = hVaults;
         this.honeydb = honeydb;
@@ -59,7 +62,7 @@ public class Authenticator
         ArrayList<Tuple<Integer, Integer>> selectedVault = new ArrayList<Tuple<Integer, Integer>>();
         while(mMatcher.getNextSet(selectedVault))
         {
-            ArrayList<Integer> predictedKey = lagrangeInterpolation(selectedVault);
+            ArrayList<Integer> predictedKey = solvePx(selectedVault);
             if(verifyKey(predictedKey))
             {
                 return true;
@@ -69,12 +72,48 @@ public class Authenticator
         return false;
     }
 
-    private ArrayList<Integer> lagrangeInterpolation(ArrayList<Tuple<Integer, Integer>> vault)
+    
+    private ArrayList<Integer> solvePx(ArrayList<Tuple<Integer, Integer>> vault)
     {
+        BigInteger[][] mat = new BigInteger[Constants.POLY_DEGREE+1][Constants.POLY_DEGREE+1];
+        int[][] yMat = new int[Constants.POLY_DEGREE+1][1];
+
+        for (int i = 0; i < Constants.POLY_DEGREE + 1; i++) 
+        {
+            Tuple<Integer, Integer> tuple = vault.get(i);
+            yMat[i][0] = tuple.y;
+
+            Integer variate = 1;
+            for (int j = 0; j < Constants.POLY_DEGREE + 1; j++)
+            {
+                mat[i][j] = new BigInteger(variate.toString());
+                variate = (int)field.multiply(variate, tuple.x);
+            }
+        }
+        
+        ModularMatrix xMat = new ModularMatrix(mat, Constants.FIELD_ORDER_16);
+        ModularMatrix inverseXMat = xMat.inverse(xMat);
+        int[][] invMat = new int[Constants.POLY_DEGREE+1][Constants.POLY_DEGREE+1];
+        for (int i = 0; i < Constants.POLY_DEGREE+1; i++) 
+        {
+            for (int j = 0; j < Constants.POLY_DEGREE + 1; j++)
+            {
+                invMat[i][j] = inverseXMat.getData()[i][j].intValue();
+            }
+        }
+
+        int[][] coefficients = new int[Constants.POLY_DEGREE + 1][1];
+        coefficients = MatrixMultiplication.multiply(invMat, yMat);
+
         ArrayList<Integer> key = new ArrayList<Integer>();
+        for(int i = 0; i < Constants.POLY_DEGREE + 1; i++)
+        {
+            key.add((int)field.modulus(coefficients[i][0]));
+        }
 
         return key;
     }
+
 
     private boolean verifyKey(ArrayList<Integer> key)
     {
