@@ -1,11 +1,11 @@
 <baseline>
-    <minutiae_extractor>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/main/resources/minutiae_extractor.py</minutiae_extractor>
-    <tarp_location>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/main/resources/tarp.jar</tarp_location>
-    <mindtct_location>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/main/resources/mindtct</mindtct_location>
-    <fingerprint_raw>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/database/fingerprint_raw/</fingerprint_raw>
-    <fingerprint_aligned>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/database/fingerprint_aligned/</fingerprint_aligned>
-    <minutiae>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/database/minutiae/</minutiae>
-    <database>/Users/sashidharjakkamsetti/workspace/cs203/biohive/src/database/</database>
+    <minutiae_extractor>C:\Users\Dell\Desktop\uci.cs203\biohive\src\main\resources\minutiae_extractor.py</minutiae_extractor>
+    <tarp_location>C:\Users\Dell\Desktop\uci.cs203\biohive\src\main\resources\tarp.jar</tarp_location>
+    <mindtct_location>C:\Users\Dell\Desktop\uci.cs203\biohive\src\main\resources\mindtct</mindtct_location>
+    <fingerprint_raw>C:\Users\Dell\Desktop\uci.cs203\biohive\src\database\fingerprint_raw</fingerprint_raw>
+    <fingerprint_aligned>C:\Users\Dell\Desktop\uci.cs203\biohive\src\database\fingerprint_aligned</fingerprint_aligned>
+    <minutiae>C:\Users\Dell\Desktop\uci.cs203\biohive\src\database\minutiae</minutiae>
+    <database>C:\Users\Dell\Desktop\uci.cs203\biohive\src\database\</database>
     <fingerprint>101_7.tif</fingerprint>
     <action>reg</action>
 </baseline>

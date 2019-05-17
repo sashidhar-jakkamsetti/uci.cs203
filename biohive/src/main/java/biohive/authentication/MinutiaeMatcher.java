@@ -1,7 +1,11 @@
 package biohive.authentication;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 import biohive.fuzzyVault.Tuple;
 import biohive.minutiaeExtraction.Minutiae;
@@ -11,8 +15,9 @@ public class MinutiaeMatcher
 {
     public ArrayList<Tuple<Integer, Integer>> vault;
     public ArrayList<Minutiae> minutiaes;
-
     private HashMap<Integer, Tuple<Integer, Double>> catalouge;
+
+    PriorityQueue<GenSet> queue;
 
     public MinutiaeMatcher(ArrayList<Tuple<Integer, Integer>> vault, ArrayList<Minutiae> minutiaes)
     {
@@ -24,17 +29,82 @@ public class MinutiaeMatcher
     public void initialize()
     {
         buildCatalouge();
+        genQueue();
+        return;
     }
 
-    public boolean getNextSet(ArrayList<Tuple<Integer, Integer>> outGoingVault)
+    public void genQueue()      //create the queue for storing all possible sets 
     {
+        queue = new PriorityQueue<GenSet>(new SetComparator());
+        GenSet newset = new GenSet();
         
-        return true;
+        int n =catalouge.size();
+        int r = n>=5?5: n/2;
+
+        recurse(catalouge, n, r , 0, 0, newset);
+        return;
+    }
+
+    class SetComparator implements Comparator<GenSet>{ 
+        public int compare(GenSet s1, GenSet s2) { 
+            if (s1.avg < s2.avg) 
+                return 1; 
+            else if (s1.avg > s2.avg) 
+                return -1;           
+            return 0; 
+        } 
+    } 
+
+    private void recurse(HashMap<Integer, Tuple<Integer,Double>> catalouge, int n, int r, int index, int i,GenSet newset)
+    {
+        if(index==r)
+        {
+            GenSet dupset = new GenSet();    //create duplicate set to add to queue - since newset is being passed by reference
+
+            for(Tuple<Integer, Double> tuple : newset.topfive) {
+               dupset.topfive.add(new Tuple(tuple.x, tuple.y));
+            }
+
+            dupset.CalculateAvg();        
+            dupset.setNo = queue.size() + 1;
+
+            queue.add(dupset);
+
+            return;
+        }
+        if(i>=n) return;
+
+        Object keyAtI = catalouge.keySet().toArray()[i];
+        newset.add(index,new Tuple<Integer, Double>((Integer)keyAtI,catalouge.get(keyAtI).y)); //new set stores code(ketAtI), score 
+     
+        recurse(catalouge, n, r, index+1, i+1, newset); //current element is included 
+        recurse(catalouge, n, r, index, i+1, newset);  //current element is not included 
+    }
+
+    public ArrayList<Tuple<Integer, Integer>> getNextSet(ArrayList<Tuple<Integer, Integer>> vault)
+    {
+        HashMap<Integer, Integer> vaultMap = Utils.convertToMap(vault);
+        ArrayList<Tuple<Integer, Integer>> list = new ArrayList<Tuple<Integer, Integer>>();
+        
+        GenSet gs = queue.poll();
+
+        for(Tuple<Integer, Double> tuple : gs.topfive)
+        {
+            Tuple<Integer, Double> catalogueValue = catalouge.get(tuple.x);
+            list.add(new Tuple(tuple.x,vaultMap.get(catalogueValue.x)));
+        }
+        return list;
+    }
+
+    public boolean SetisEmpty()
+    {
+        return queue.isEmpty();
     }
 
     private HashMap<Integer, Tuple<Integer, Double>> buildCatalouge()
     {
         HashMap<Integer, Integer> vaultMap = Utils.convertToMap(vault);
+        
         for (Minutiae m : minutiaes) 
         {
             Double minScore = 1.0;
@@ -43,7 +113,6 @@ public class MinutiaeMatcher
                 Minutiae vaultM = new Minutiae(key);
                 vaultM.decode();
                 Double score = m.distance(vaultM);
-
                 if(score < minScore)
                 {
                     minScore = score;

@@ -131,7 +131,7 @@ public class Baseline
         in_fingerprint = String.format("%s/%s", fingerprint_raw, fingerprint);
         out_minutiae = String.format("%s/%s", minutiae, infileTag);
         out_fingerprintAligned = String.format("%s/%s.aligned.jpeg", fingerprint_aligned, infileTag);
-        biodb = String.format("%s/%s", database, Constants.DATABASE_BIO_FILENAME);
+        biodb = String.format("%s%s", database, Constants.DATABASE_BIO_FILENAME);
         honeydb = String.format("%s/%s", database, Constants.DATABASE_HONEY_FILENAME);
 
         if(action.equals(Constants.ACTION_REGISTER))

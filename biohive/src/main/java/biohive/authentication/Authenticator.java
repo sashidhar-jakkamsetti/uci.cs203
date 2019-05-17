@@ -26,6 +26,8 @@ public class Authenticator
     {
         ArrayList<Minutiae> redecodedMinutiaes = decodeMinutiae(minutiaes);
         Integer idx = 0;
+
+        //isSugarVault(hVaults.get(0), redecodedMinutiaes);
         for ( ArrayList<Tuple<Integer, Integer>> vault : hVaults) 
         {
             if(isSugarVault(vault, redecodedMinutiaes))
@@ -56,9 +58,12 @@ public class Authenticator
     {
         MinutiaeMatcher mMatcher = new MinutiaeMatcher(vault, minutiaes);
         mMatcher.initialize();
-        ArrayList<Tuple<Integer, Integer>> selectedVault = new ArrayList<Tuple<Integer, Integer>>();
-        while(mMatcher.getNextSet(selectedVault))
+
+        //ArrayList<Tuple<Integer, Integer>> selectedVault = new ArrayList<Tuple<Integer, Integer>>();
+        while(!mMatcher.SetisEmpty())
         {
+            ArrayList<Tuple<Integer, Integer>> selectedVault = mMatcher.getNextSet(vault);
+            
             ArrayList<Integer> predictedKey = lagrangeInterpolation(selectedVault);
             if(verifyKey(predictedKey))
             {
@@ -72,7 +77,7 @@ public class Authenticator
     private ArrayList<Integer> lagrangeInterpolation(ArrayList<Tuple<Integer, Integer>> vault)
     {
         ArrayList<Integer> key = new ArrayList<Integer>();
-
+        //coeffs of polynomial
         return key;
     }
 
