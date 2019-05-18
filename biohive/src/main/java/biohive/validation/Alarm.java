@@ -1,4 +1,4 @@
-package biohive.alarm;
+package biohive.validation;
 
 import biohive.utility.Constants;
 

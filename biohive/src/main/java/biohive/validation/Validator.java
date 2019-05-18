@@ -1,6 +1,5 @@
 package biohive.validation;
 
-import biohive.alarm.Alarm;
 import biohive.utility.DatabaseIO;
 
 public class Validator
