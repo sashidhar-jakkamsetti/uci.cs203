@@ -28,8 +28,8 @@ public class Authenticator
     public boolean authenticate(ArrayList<Minutiae> minutiaes) throws Exception
     {
         ArrayList<Minutiae> redecodedMinutiaes = decodeMinutiae(minutiaes);
+        
         Integer idx = 0;
-
         for ( ArrayList<Tuple<Integer, Integer>> vault : hVaults) 
         {
             if(isSugarVault(vault, redecodedMinutiaes))
@@ -45,6 +45,7 @@ public class Authenticator
     private ArrayList<Minutiae> decodeMinutiae(ArrayList<Minutiae> minutiaes)
     {
         ArrayList<Minutiae> newMinutiaes = new ArrayList<Minutiae>();
+
         for (Minutiae m : minutiaes) 
         {
             Minutiae newM = new Minutiae(m.code);
@@ -64,8 +65,8 @@ public class Authenticator
         while(!mMatcher.isSetEmpty())
         {
             ArrayList<Tuple<Integer, Integer>> selectedVault = mMatcher.getNextSet(vault);
-            
             ArrayList<Integer> predictedKey = solvePx(selectedVault);
+
             if(verifyKey(predictedKey))
             {
                 return true;
@@ -78,8 +79,8 @@ public class Authenticator
     
     private ArrayList<Integer> solvePx(ArrayList<Tuple<Integer, Integer>> vault)
     {
-        BigInteger[][] mat = new BigInteger[Constants.POLY_DEGREE+1][Constants.POLY_DEGREE+1];
-        int[][] yMat = new int[Constants.POLY_DEGREE+1][1];
+        BigInteger[][] mat = new BigInteger[Constants.POLY_DEGREE + 1][Constants.POLY_DEGREE + 1];
+        int[][] yMat = new int[Constants.POLY_DEGREE + 1][1];
 
         for (int i = 0; i < Constants.POLY_DEGREE + 1; i++) 
         {
@@ -96,7 +97,8 @@ public class Authenticator
         
         ModularMatrix xMat = new ModularMatrix(mat, Constants.FIELD_ORDER_16);
         ModularMatrix inverseXMat = xMat.inverse(xMat);
-        int[][] invMat = new int[Constants.POLY_DEGREE+1][Constants.POLY_DEGREE+1];
+        int[][] invMat = new int[Constants.POLY_DEGREE + 1][Constants.POLY_DEGREE + 1];
+
         for (int i = 0; i < Constants.POLY_DEGREE+1; i++) 
         {
             for (int j = 0; j < Constants.POLY_DEGREE + 1; j++)
@@ -107,8 +109,8 @@ public class Authenticator
 
         int[][] coefficients = new int[Constants.POLY_DEGREE + 1][1];
         coefficients = MatrixMultiplication.multiply(invMat, yMat);
-
         ArrayList<Integer> key = new ArrayList<Integer>();
+
         for(int i = 0; i < Constants.POLY_DEGREE + 1; i++)
         {
             key.add((int)field.modulus(coefficients[i][0]));
@@ -120,7 +122,14 @@ public class Authenticator
 
     private boolean verifyKey(ArrayList<Integer> key)
     {
-        return Utils.hashMe(new ArrayList<Integer>(key.stream().limit(Constants.POLY_DEGREE).collect(Collectors.toList()))) == 
-                key.get(Constants.POLY_DEGREE);
+        Integer hashResult = Utils.hashMe(new ArrayList<Integer>(key.stream().limit(Constants.POLY_DEGREE).collect(Collectors.toList())));
+        Integer modHashResult = (int)field.modulus(hashResult);
+
+        if(modHashResult.equals(key.get(Constants.POLY_DEGREE))) 
+        {
+            return true;
+        }
+
+        return false;
     }
 }

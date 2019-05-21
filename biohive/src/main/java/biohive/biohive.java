@@ -41,8 +41,14 @@ public class biohive
                             HoneywordGenerator hGenerator = new HoneywordGenerator(sugarVault);
                             if(hGenerator.generate())
                             {
+                                if(bInfo.getClearDb())
+                                {
+                                    System.out.println("Clearing the database.");
+                                    DatabaseIO.clearDb(bInfo.biodb);
+                                    DatabaseIO.clearDb(bInfo.honeydb);
+                                }
+
                                 System.out.println("Registering the vaults with userId: " + bInfo.userId);
-                                
                                 DatabaseIO.setHoneyVaults(bInfo.userId, hGenerator.getHoneyVaults(), bInfo.biodb);
                                 DatabaseIO.setHoneyChecker(bInfo.userId, hGenerator.getHoneyChecker(), bInfo.honeydb);
     
@@ -86,7 +92,7 @@ public class biohive
         }
         else
         {
-            baselineFile = "/Users/sashidharjakkamsetti/workspace/cs203/biohive/biohive.xml";
+            baselineFile = "/home/sashidhar/course-work/cs203/uci.cs203/biohive/biohive.xml";
         }
 
         ConfigLoader loader = new ConfigLoader(baselineFile);

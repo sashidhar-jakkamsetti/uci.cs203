@@ -29,7 +29,9 @@ public class HoneywordGenerator
     public boolean generate()
     {
         HashMap<Integer, ArrayList<Tuple<Integer, Integer>>> unlockedHVaults = new HashMap<Integer, ArrayList<Tuple<Integer, Integer>>>();
-        for(int i = 0; i < Constants.NUMBER_OF_HONEY_WORDS; i++) 
+        unlockedHVaults.put(0, sugarVault.getVault());
+        
+        for(int i = 1; i < Constants.NUMBER_OF_HONEY_WORDS + 1; i++) 
         {
             ArrayList<Minutiae> hMinutiaes = generateHoneyMinutiae();
             FuzzyVault hVault = new FuzzyVault(hMinutiaes);
@@ -38,9 +40,8 @@ public class HoneywordGenerator
                 unlockedHVaults.put(i, hVault.getVault());
             }
         }
-
-        unlockedHVaults.put(Constants.NUMBER_OF_HONEY_WORDS, sugarVault.getVault());
         lock(unlockedHVaults);
+        //honeyVaults.addAll(unlockedHVaults.values());
 
         return true;
     }
@@ -49,11 +50,12 @@ public class HoneywordGenerator
     {
         ArrayList<Integer> keys = new ArrayList<Integer>(unlockedHVaults.keySet());
         Collections.shuffle(keys);
+
         int idx = 0;
         for (int key : keys) 
         {
             honeyVaults.add(unlockedHVaults.get(key));
-            if(key == Constants.NUMBER_OF_HONEY_WORDS)
+            if(key == 0)
             {
                 honeyChecker = idx;
             }
@@ -64,6 +66,7 @@ public class HoneywordGenerator
     private ArrayList<Minutiae> generateHoneyMinutiae()
     {
         ArrayList<Minutiae> hMinutiaes = new ArrayList<Minutiae>();
+        
         for(int i = 0; i < Constants.NUMBER_OF_MINUTIAE; i++)
         {
             Minutiae m = new Minutiae();

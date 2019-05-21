@@ -6,13 +6,14 @@ import biohive.fuzzyVault.Tuple;
 
 public class GenSet
 {
-    
-    public ArrayList<Tuple<Integer, Double>> topfive = new ArrayList<Tuple<Integer, Double>>();
+    public ArrayList<Tuple<Integer, Double>> topfive;
     public double avg;
     public int setNo;
 
     GenSet()
-    {}
+    {
+        topfive = new ArrayList<Tuple<Integer, Double>>();
+    }
 
     GenSet(GenSet s)
     {
@@ -31,8 +32,6 @@ public class GenSet
         {
             topfive.add(tuple);
         }
-
-
     }
 
     public void calculateAvg()
@@ -52,6 +51,4 @@ public class GenSet
     {
         return topfive.size();
     }
-
-    
 }

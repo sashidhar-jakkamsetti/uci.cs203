@@ -4,21 +4,25 @@ import java.util.*;
 
 import biohive.fuzzyVault.Tuple;
 import biohive.minutiaeExtraction.Minutiae;
+import biohive.utility.Constants;
 import biohive.utility.Utils;
 
 public class MinutiaeMatcher
 {
     public ArrayList<Tuple<Integer, Integer>> vault;
     public ArrayList<Minutiae> minutiaes;
-    private HashMap<Integer, Tuple<Integer, Double>> catalouge;
 
-    PriorityQueue<GenSet> queue;
+    private HashMap<Integer, Integer> vaultMap;
+    private HashMap<Integer, Tuple<Integer, Double>> catalouge;
+    private PriorityQueue<GenSet> queue;
 
     public MinutiaeMatcher(ArrayList<Tuple<Integer, Integer>> vault, ArrayList<Minutiae> minutiaes)
     {
         this.vault = vault;
         this.minutiaes = minutiaes;
+        vaultMap = Utils.convertToMap(vault);
         catalouge = new HashMap<Integer, Tuple<Integer, Double>>();
+        queue = new PriorityQueue<GenSet>(new SetComparator());
     }
 
     public void initialize()
@@ -28,13 +32,12 @@ public class MinutiaeMatcher
         return;
     }
 
-    public void genQueue()      //create the queue for storing all possible sets 
+    public void genQueue()
     {
-        queue = new PriorityQueue<GenSet>(new SetComparator());
         GenSet newset = new GenSet();
         
-        int n =catalouge.size();
-        int r = n>=5?5: n/2;
+        int n = catalouge.size();
+        int r = n >= Constants.POLY_DEGREE + 1 ? Constants.POLY_DEGREE + 1: n/2;
 
         recurse(catalouge, n, r , 0, 0, newset);
         return;
@@ -61,9 +64,9 @@ public class MinutiaeMatcher
 
     private void recurse(HashMap<Integer, Tuple<Integer,Double>> catalouge, int n, int r, int index, int i,GenSet newset)
     {
-        if(index==r)
+        if(index == r)
         {
-            GenSet dupset = new GenSet();    //create duplicate set to add to queue - since newset is being passed by reference
+            GenSet dupset = new GenSet();
 
             for(Tuple<Integer, Double> tuple : newset.topfive) 
             {
@@ -77,55 +80,56 @@ public class MinutiaeMatcher
 
             return;
         }
-        if(i>=n) return;
+
+        if(i >= n) 
+        {
+            return;
+        }
 
         Object keyAtI = catalouge.keySet().toArray()[i];
-        newset.add(index,new Tuple<Integer, Double>((Integer)keyAtI,catalouge.get(keyAtI).y)); //new set stores code(ketAtI), score 
+        newset.add(index,new Tuple<Integer, Double>((Integer)keyAtI,catalouge.get(keyAtI).y));
      
-        recurse(catalouge, n, r, index + 1, i + 1, newset); //current element is included 
-        recurse(catalouge, n, r, index, i + 1, newset);  //current element is not included 
+        recurse(catalouge, n, r, index + 1, i + 1, newset);
+        recurse(catalouge, n, r, index, i + 1, newset);
     }
 
     public ArrayList<Tuple<Integer, Integer>> getNextSet(ArrayList<Tuple<Integer, Integer>> vault)
     {
-        HashMap<Integer, Integer> vaultMap = Utils.convertToMap(vault);
-        ArrayList<Tuple<Integer, Integer>> list = new ArrayList<Tuple<Integer, Integer>>();
+        ArrayList<Tuple<Integer, Integer>> returnVault = new ArrayList<Tuple<Integer, Integer>>();
         
         GenSet gs = queue.poll();
-
         for(Tuple<Integer, Double> tuple : gs.topfive)
         {
             Tuple<Integer, Double> catalogueValue = catalouge.get(tuple.x);
-            list.add(new Tuple<Integer, Integer>(tuple.x,vaultMap.get(catalogueValue.x)));
+            returnVault.add(new Tuple<Integer, Integer>(tuple.x,vaultMap.get(catalogueValue.x)));
         }
-        return list;
-    }
 
-    public boolean isSetEmpty()
-    {
-        return queue.isEmpty();
+        return returnVault;
     }
 
     private HashMap<Integer, Tuple<Integer, Double>> buildCatalouge()
     {
-        HashMap<Integer, Integer> vaultMap = Utils.convertToMap(vault);
-        
         for (Minutiae m : minutiaes) 
         {
             Double minScore = Double.MAX_VALUE;
-            for (Integer key : vaultMap.keySet()) 
+            for (Tuple<Integer, Integer> point : vault) 
             {
-                Minutiae vaultM = new Minutiae(key);
+                Minutiae vaultM = new Minutiae(point.x);
                 vaultM.decode();
                 Double score = m.distance(vaultM);
                 if(score < minScore)
                 {
                     minScore = score;
-                    catalouge.put(m.code, new Tuple<Integer, Double>(key, score));
+                    catalouge.put(m.code, new Tuple<Integer, Double>(point.x, score));
                 }
             }
         }
 
         return catalouge;
+    }
+
+    public boolean isSetEmpty()
+    {
+        return queue.isEmpty();
     }
 }

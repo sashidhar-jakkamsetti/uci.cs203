@@ -23,6 +23,7 @@ public class Baseline
     String database;
     String fingerprint;
     String action;
+    Boolean clearDb;
 
     public String getMinutiae_extractor() 
     {
@@ -121,6 +122,17 @@ public class Baseline
     public void setAction(String action) 
     {
         this.action = action;
+    }
+
+    public Boolean getClearDb() 
+    {
+        return clearDb;
+    }
+
+    @XmlElement
+    public void setClearDb(Boolean clearDb) 
+    {
+        this.clearDb = clearDb;
     }
 
     public void prepareOutputIdentifiers()

@@ -25,6 +25,7 @@ public class FuzzyVault
     public boolean create()
     {
         HashMap<Integer, Tuple<Integer, Integer>> unlockedVault = new HashMap<Integer, Tuple<Integer, Integer>>();
+
         ArrayList<Integer> key = pickRandomKey();
         int idx = 0;
         for (Minutiae m : minutiaes) 
@@ -37,19 +38,22 @@ public class FuzzyVault
             Tuple<Integer, Integer> chaff = getChaffPoint(key);
             unlockedVault.put(idx++, new Tuple<Integer, Integer>(chaff.x, chaff.y));
         }
+
         lock(unlockedVault);
+        //vault.addAll(unlockedVault.values());
         return true;
     }
 
     private ArrayList<Integer> pickRandomKey()
     {
         ArrayList<Integer> key = new ArrayList<Integer>();
+
         for(int i = 0; i < Constants.POLY_DEGREE; i++)
         {
             key.add((int)field.randomElement());
         }
-        key.add((int)field.modulus(Utils.hashMe(key)));
 
+        key.add((int)field.modulus(Utils.hashMe(key)));
         return key;
     }
 
@@ -57,6 +61,7 @@ public class FuzzyVault
     {
         int variate = 1;
         int result = 0;
+
         for (int coefficient : key) 
         {
             result = (int)field.add(result, field.multiply(coefficient, variate));
@@ -83,6 +88,7 @@ public class FuzzyVault
     {
         ArrayList<Integer> keys = new ArrayList<Integer>(unlockedVault.keySet());
         Collections.shuffle(keys);
+        
         for (int key : keys) 
         {
             vault.add(unlockedVault.get(key));

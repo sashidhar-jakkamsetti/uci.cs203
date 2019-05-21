@@ -110,9 +110,12 @@ public class ModularMatrix
 
     private BigInteger changeSign(int i) 
     {
-        if (i % 2 == 0) {
+        if (i % 2 == 0) 
+        {
             return new BigInteger("1"); 
-        } else {
+        }
+        else 
+        {
             return new BigInteger("-1");
         }
     }
