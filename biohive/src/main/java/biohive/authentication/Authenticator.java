@@ -29,6 +29,7 @@ public class Authenticator
     {
         ArrayList<Minutiae> redecodedMinutiaes = decodeMinutiae(minutiaes);
         Integer idx = 0;
+
         for ( ArrayList<Tuple<Integer, Integer>> vault : hVaults) 
         {
             if(isSugarVault(vault, redecodedMinutiaes))
@@ -59,9 +60,11 @@ public class Authenticator
     {
         MinutiaeMatcher mMatcher = new MinutiaeMatcher(vault, minutiaes);
         mMatcher.initialize();
-        ArrayList<Tuple<Integer, Integer>> selectedVault = new ArrayList<Tuple<Integer, Integer>>();
-        while(mMatcher.getNextSet(selectedVault))
+
+        while(!mMatcher.isSetEmpty())
         {
+            ArrayList<Tuple<Integer, Integer>> selectedVault = mMatcher.getNextSet(vault);
+            
             ArrayList<Integer> predictedKey = solvePx(selectedVault);
             if(verifyKey(predictedKey))
             {

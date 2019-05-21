@@ -8,17 +8,21 @@ public class ModularMatrix
     private int ncols;
     private BigInteger[][] data;
     private BigInteger mod;
+    private Integer fieldOrder;
 
     public ModularMatrix(BigInteger[][] mat, Integer fieldOrder) 
     {
-        this.mod = new BigInteger(fieldOrder.toString());
+        this.fieldOrder = fieldOrder;
+        this.mod = new BigInteger(this.fieldOrder.toString());
         this.data = mat;
         this.nrows = mat.length;
         this.ncols = mat[0].length;
     }
 
-    public ModularMatrix(int nrow, int ncol) 
+    public ModularMatrix(int nrow, int ncol, Integer fieldOrder) 
     {
+        this.fieldOrder = fieldOrder;
+        this.mod = new BigInteger(this.fieldOrder.toString());
         this.nrows = nrow;
         this.ncols = ncol;
         data = new BigInteger[nrow][ncol];
@@ -70,9 +74,9 @@ public class ModularMatrix
     }
 
     // Take the transpose of the Matrix..
-    public static ModularMatrix transpose(ModularMatrix matrix) 
+    public ModularMatrix transpose(ModularMatrix matrix) 
     {
-        ModularMatrix transposedMatrix = new ModularMatrix(matrix.getNcols(), matrix.getNrows());
+        ModularMatrix transposedMatrix = new ModularMatrix(matrix.getNcols(), matrix.getNrows(), matrix.fieldOrder);
         for (int i = 0; i < matrix.getNrows(); i++) 
         {
             for (int j = 0; j < matrix.getNcols(); j++) 
@@ -84,7 +88,7 @@ public class ModularMatrix
     }
 
     // All operations are using Big Integers... Not Modular of anything
-    public static BigInteger determinant(ModularMatrix matrix) 
+    public BigInteger determinant(ModularMatrix matrix) 
     {
 
         if (matrix.size() == 1) 
@@ -104,7 +108,7 @@ public class ModularMatrix
         return sum;
     }
 
-    private static BigInteger changeSign(int i) 
+    private BigInteger changeSign(int i) 
     {
         if (i % 2 == 0) {
             return new BigInteger("1"); 
@@ -113,9 +117,9 @@ public class ModularMatrix
         }
     }
 
-    public static ModularMatrix createSubMatrix(ModularMatrix matrix, int excluding_row, int excluding_col) 
+    public ModularMatrix createSubMatrix(ModularMatrix matrix, int excluding_row, int excluding_col) 
     {
-        ModularMatrix mat = new ModularMatrix(matrix.getNrows() - 1, matrix.getNcols() - 1);
+        ModularMatrix mat = new ModularMatrix(matrix.getNrows() - 1, matrix.getNcols() - 1, matrix.fieldOrder);
         int r = -1;
         for (int i = 0; i < matrix.getNrows(); i++) 
         {
@@ -139,7 +143,7 @@ public class ModularMatrix
 
     public ModularMatrix cofactor(ModularMatrix matrix) 
     {
-        ModularMatrix mat = new ModularMatrix(matrix.getNrows(), matrix.getNcols());
+        ModularMatrix mat = new ModularMatrix(matrix.getNrows(), matrix.getNcols(), matrix.fieldOrder);
         for (int i = 0; i < matrix.getNrows(); i++) 
         {
             for (int j = 0; j < matrix.getNcols(); j++) 

@@ -42,8 +42,10 @@ public class biohive
                             if(hGenerator.generate())
                             {
                                 System.out.println("Registering the vaults with userId: " + bInfo.userId);
+                                
                                 DatabaseIO.setHoneyVaults(bInfo.userId, hGenerator.getHoneyVaults(), bInfo.biodb);
                                 DatabaseIO.setHoneyChecker(bInfo.userId, hGenerator.getHoneyChecker(), bInfo.honeydb);
+    
                                 return true;
                             }
                         }

@@ -13,7 +13,20 @@ public class DatabaseIO
 {
     public static void setHoneyVaults(String userid, ArrayList<ArrayList<Tuple<Integer, Integer>>> hVaults, String outFilename) throws Exception
     {
+        BufferedReader bReader = new BufferedReader(new FileReader(outFilename));
+        String line;
+        while ((line = bReader.readLine()) != null) 
+        {
+            String[] tokens = line.split(" ");
+            if(tokens.length > 1 && tokens[0] == userid)
+            {
+                throw new Exception("Honey vaults for the user already present!");
+            }
+        }
+        bReader.close();
+
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(outFilename, true)));
+        
         for (ArrayList<Tuple<Integer, Integer>> vault : hVaults) 
         {
             StringBuilder sb = new StringBuilder();
@@ -31,6 +44,18 @@ public class DatabaseIO
 
     public static void setHoneyChecker(String userid, Integer hChecker, String outFilename) throws Exception
     {
+        BufferedReader bReader = new BufferedReader(new FileReader(outFilename));
+        String line;
+        while ((line = bReader.readLine()) != null) 
+        {
+            String[] tokens = line.split(" ");
+            if(tokens.length > 1 && tokens[0] == userid)
+            {
+                throw new Exception("Honey id for the user already present!");
+            }
+        }
+        bReader.close();
+
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(outFilename, true)));
         writer.println(String.format("%s %s", userid, hChecker.toString()));
         writer.close();
@@ -45,7 +70,7 @@ public class DatabaseIO
         while ((line = bReader.readLine()) != null) 
         {
             String[] tokens = line.split(" ");
-            if(tokens.length > 1 && tokens[0] == userid)
+            if(tokens.length > 1 && tokens[0].equals(userid))
             {
                 ArrayList<Tuple<Integer, Integer>> hVault = new ArrayList<Tuple<Integer, Integer>>();
                 for(int i = 1; i < tokens.length;)
