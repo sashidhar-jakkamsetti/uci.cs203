@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import biohive.fuzzyVault.FuzzyVault;
-import biohive.fuzzyVault.Tuple;
 import biohive.minutiaeExtraction.Minutiae;
 import biohive.utility.Constants;
 import cc.redberry.rings.IntegersZp64;
@@ -16,20 +15,20 @@ public class HoneywordGenerator
     private IntegersZp64 field31;
     private IntegersZp64 field61;
     private int honeyChecker;
-    private ArrayList<ArrayList<Tuple<Integer, Integer>>> honeyVaults;
+    private ArrayList<FuzzyVault> honeyVaults;
 
     public HoneywordGenerator(FuzzyVault sugarVault)
     {
-        this.sugarVault = sugarVault.clone();
+        this.sugarVault = sugarVault;
         field31 = new IntegersZp64(Constants.FIELD_ORDER_5);
         field61 = new IntegersZp64(Constants.FIELD_ORDER_6);
-        honeyVaults = new ArrayList<ArrayList<Tuple<Integer, Integer>>>();
+        honeyVaults = new ArrayList<FuzzyVault>();
     }
 
     public boolean generate()
     {
-        HashMap<Integer, ArrayList<Tuple<Integer, Integer>>> unlockedHVaults = new HashMap<Integer, ArrayList<Tuple<Integer, Integer>>>();
-        unlockedHVaults.put(0, sugarVault.getVault());
+        HashMap<Integer, FuzzyVault> unlockedHVaults = new HashMap<Integer, FuzzyVault>();
+        unlockedHVaults.put(0, sugarVault);
         
         for(int i = 1; i < Constants.NUMBER_OF_HONEY_WORDS + 1; i++) 
         {
@@ -37,7 +36,7 @@ public class HoneywordGenerator
             FuzzyVault hVault = new FuzzyVault(hMinutiaes);
             if(hVault.create())
             {
-                unlockedHVaults.put(i, hVault.getVault());
+                unlockedHVaults.put(i, hVault);
             }
         }
         lock(unlockedHVaults);
@@ -46,7 +45,7 @@ public class HoneywordGenerator
         return true;
     }
 
-    private void lock(HashMap<Integer, ArrayList<Tuple<Integer, Integer>>> unlockedHVaults)
+    private void lock(HashMap<Integer, FuzzyVault> unlockedHVaults)
     {
         ArrayList<Integer> keys = new ArrayList<Integer>(unlockedHVaults.keySet());
         Collections.shuffle(keys);
@@ -81,7 +80,7 @@ public class HoneywordGenerator
         return hMinutiaes;
     }
 
-    public ArrayList<ArrayList<Tuple<Integer, Integer>>> getHoneyVaults()
+    public ArrayList<FuzzyVault> getHoneyVaults()
     {
         return honeyVaults;
     }

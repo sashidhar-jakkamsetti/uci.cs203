@@ -1,7 +1,6 @@
 package biohive.authentication;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.math.BigInteger;
 
 import biohive.fuzzyVault.*;
@@ -12,12 +11,12 @@ import cc.redberry.rings.IntegersZp64;
 
 public class Authenticator
 {
-    private ArrayList<ArrayList<Tuple<Integer, Integer>>> hVaults;
+    private ArrayList<FuzzyVault> hVaults;
     private String userId;
     private String honeydb;
     private IntegersZp64 field;
 
-    public Authenticator(String userId, ArrayList<ArrayList<Tuple<Integer, Integer>>> hVaults, String honeydb)
+    public Authenticator(String userId, ArrayList<FuzzyVault> hVaults, String honeydb)
     {
         field = new IntegersZp64(Constants.FIELD_ORDER_16);
         this.userId = userId;
@@ -30,7 +29,7 @@ public class Authenticator
         ArrayList<Minutiae> redecodedMinutiaes = decodeMinutiae(minutiaes);
         
         Integer idx = 0;
-        for ( ArrayList<Tuple<Integer, Integer>> vault : hVaults) 
+        for ( FuzzyVault vault : hVaults) 
         {
             if(isSugarVault(vault, redecodedMinutiaes))
             {
@@ -57,17 +56,17 @@ public class Authenticator
         return newMinutiaes;
     }
 
-    private boolean isSugarVault(ArrayList<Tuple<Integer, Integer>> vault, ArrayList<Minutiae> minutiaes)
+    private boolean isSugarVault(FuzzyVault vault, ArrayList<Minutiae> minutiaes)
     {
         MinutiaeMatcher mMatcher = new MinutiaeMatcher(vault, minutiaes);
         mMatcher.initialize();
 
         while(!mMatcher.isSetEmpty())
         {
-            ArrayList<Tuple<Integer, Integer>> selectedVault = mMatcher.getNextSet(vault);
+            ArrayList<Tuple<Integer, Integer>> selectedVault = mMatcher.getNextSet();
             ArrayList<Integer> predictedKey = solvePx(selectedVault);
 
-            if(verifyKey(predictedKey))
+            if(verifyKey(predictedKey, vault.getHashKey()))
             {
                 return true;
             }
@@ -99,7 +98,7 @@ public class Authenticator
         ModularMatrix inverseXMat = xMat.inverse(xMat);
         int[][] invMat = new int[Constants.POLY_DEGREE + 1][Constants.POLY_DEGREE + 1];
 
-        for (int i = 0; i < Constants.POLY_DEGREE+1; i++) 
+        for (int i = 0; i < Constants.POLY_DEGREE + 1; i++) 
         {
             for (int j = 0; j < Constants.POLY_DEGREE + 1; j++)
             {
@@ -108,7 +107,7 @@ public class Authenticator
         }
 
         int[][] coefficients = new int[Constants.POLY_DEGREE + 1][1];
-        coefficients = MatrixMultiplication.multiply(invMat, yMat);
+        coefficients = MatrixMultiplication.multiply(invMat, yMat, Constants.FIELD_ORDER_16);
         ArrayList<Integer> key = new ArrayList<Integer>();
 
         for(int i = 0; i < Constants.POLY_DEGREE + 1; i++)
@@ -120,12 +119,10 @@ public class Authenticator
     }
 
 
-    private boolean verifyKey(ArrayList<Integer> key)
+    private boolean verifyKey(ArrayList<Integer> key, BigInteger verifierKey)
     {
-        Integer hashResult = Utils.hashMe(new ArrayList<Integer>(key.stream().limit(Constants.POLY_DEGREE).collect(Collectors.toList())));
-        Integer modHashResult = (int)field.modulus(hashResult);
-
-        if(modHashResult.equals(key.get(Constants.POLY_DEGREE))) 
+        BigInteger proverKey = Utils.hashMe(key);
+        if(verifierKey.equals(proverKey)) 
         {
             return true;
         }

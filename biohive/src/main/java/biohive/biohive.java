@@ -59,7 +59,7 @@ public class biohive
                     else
                     {
                         System.out.println("Quering minutiae with userId: " + bInfo.userId);
-                        ArrayList<ArrayList<Tuple<Integer, Integer>>> hVaults = DatabaseIO.getHoneyVaults(bInfo.userId, bInfo.biodb);
+                        ArrayList<FuzzyVault> hVaults = DatabaseIO.getHoneyVaults(bInfo.userId, bInfo.biodb);
 
                         if(hVaults.size() == Constants.NUMBER_OF_HONEY_WORDS + 1)
                         {
@@ -92,7 +92,7 @@ public class biohive
         }
         else
         {
-            baselineFile = "/home/sashidhar/course-work/cs203/uci.cs203/biohive/biohive.xml";
+            baselineFile = "/Users/sashidharjakkamsetti/workspace/cs203/biohive/biohive.xml";
         }
 
         ConfigLoader loader = new ConfigLoader(baselineFile);

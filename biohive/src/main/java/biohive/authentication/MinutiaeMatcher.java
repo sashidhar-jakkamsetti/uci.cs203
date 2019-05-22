@@ -2,6 +2,7 @@ package biohive.authentication;
 
 import java.util.*;
 
+import biohive.fuzzyVault.FuzzyVault;
 import biohive.fuzzyVault.Tuple;
 import biohive.minutiaeExtraction.Minutiae;
 import biohive.utility.Constants;
@@ -9,18 +10,18 @@ import biohive.utility.Utils;
 
 public class MinutiaeMatcher
 {
-    public ArrayList<Tuple<Integer, Integer>> vault;
+    public FuzzyVault vault;
     public ArrayList<Minutiae> minutiaes;
 
     private HashMap<Integer, Integer> vaultMap;
     private HashMap<Integer, Tuple<Integer, Double>> catalouge;
     private PriorityQueue<GenSet> queue;
 
-    public MinutiaeMatcher(ArrayList<Tuple<Integer, Integer>> vault, ArrayList<Minutiae> minutiaes)
+    public MinutiaeMatcher(FuzzyVault vault, ArrayList<Minutiae> minutiaes)
     {
         this.vault = vault;
         this.minutiaes = minutiaes;
-        vaultMap = Utils.convertToMap(vault);
+        vaultMap = Utils.convertToMap(vault.getVault());
         catalouge = new HashMap<Integer, Tuple<Integer, Double>>();
         queue = new PriorityQueue<GenSet>(new SetComparator());
     }
@@ -37,7 +38,7 @@ public class MinutiaeMatcher
         GenSet newset = new GenSet();
         
         int n = catalouge.size();
-        int r = n >= Constants.POLY_DEGREE + 1 ? Constants.POLY_DEGREE + 1: n/2;
+        int r = catalouge.size() >= Constants.POLY_DEGREE + 1 ? Constants.POLY_DEGREE + 1: n/2;
 
         recurse(catalouge, n, r , 0, 0, newset);
         return;
@@ -93,7 +94,7 @@ public class MinutiaeMatcher
         recurse(catalouge, n, r, index, i + 1, newset);
     }
 
-    public ArrayList<Tuple<Integer, Integer>> getNextSet(ArrayList<Tuple<Integer, Integer>> vault)
+    public ArrayList<Tuple<Integer, Integer>> getNextSet()
     {
         ArrayList<Tuple<Integer, Integer>> returnVault = new ArrayList<Tuple<Integer, Integer>>();
         
@@ -101,7 +102,7 @@ public class MinutiaeMatcher
         for(Tuple<Integer, Double> tuple : gs.topfive)
         {
             Tuple<Integer, Double> catalogueValue = catalouge.get(tuple.x);
-            returnVault.add(new Tuple<Integer, Integer>(tuple.x,vaultMap.get(catalogueValue.x)));
+            returnVault.add(new Tuple<Integer, Integer>(tuple.x, vaultMap.get(catalogueValue.x)));
         }
 
         return returnVault;
@@ -112,7 +113,7 @@ public class MinutiaeMatcher
         for (Minutiae m : minutiaes) 
         {
             Double minScore = Double.MAX_VALUE;
-            for (Tuple<Integer, Integer> point : vault) 
+            for (Tuple<Integer, Integer> point : vault.getVault()) 
             {
                 Minutiae vaultM = new Minutiae(point.x);
                 vaultM.decode();

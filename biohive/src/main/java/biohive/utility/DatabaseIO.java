@@ -5,26 +5,29 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 
+import biohive.fuzzyVault.FuzzyVault;
 import biohive.fuzzyVault.Tuple;
 
 public class DatabaseIO
 {
-    public static void setHoneyVaults(String userid, ArrayList<ArrayList<Tuple<Integer, Integer>>> hVaults, String outFilename) throws Exception
+    public static void setHoneyVaults(String userid, ArrayList<FuzzyVault> hVaults, String outFilename) throws Exception
     {
         checkIfUserAlreadyRegistered(userid, outFilename);
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(outFilename, true)));
-        for (ArrayList<Tuple<Integer, Integer>> vault : hVaults) 
+        for (FuzzyVault vault : hVaults) 
         {
             StringBuilder sb = new StringBuilder();
             sb.append(userid);
 
-            for (Tuple<Integer, Integer> tuple : vault) 
+            for (Tuple<Integer, Integer> tuple : vault.getVault()) 
             {
                 sb.append(String.format(" %s %s", tuple.x.toString(), tuple.y.toString()));
             }
 
+            sb.append(" " + vault.getHashKey().toString());
             writer.println(sb.toString().trim());
         }
         writer.close();
@@ -38,9 +41,9 @@ public class DatabaseIO
         writer.close();
     }
 
-    public static ArrayList<ArrayList<Tuple<Integer, Integer>>> getHoneyVaults(String userid, String inFilename) throws Exception
+    public static ArrayList<FuzzyVault> getHoneyVaults(String userid, String inFilename) throws Exception
     {
-        ArrayList<ArrayList<Tuple<Integer, Integer>>> hVaults = new ArrayList<ArrayList<Tuple<Integer, Integer>>>();
+        ArrayList<FuzzyVault> hVaults = new ArrayList<FuzzyVault>();
         BufferedReader bReader = new BufferedReader(new FileReader(inFilename));
         
         String line;
@@ -50,11 +53,13 @@ public class DatabaseIO
             if(tokens.length > 1 && tokens[0].equals(userid))
             {
                 ArrayList<Tuple<Integer, Integer>> hVault = new ArrayList<Tuple<Integer, Integer>>();
-                for(int i = 1; i < tokens.length;)
+                for(int i = 1; i < tokens.length - 1;)
                 {
                     hVault.add(new Tuple<Integer, Integer>(Integer.parseInt(tokens[i++]), Integer.parseInt(tokens[i++])));
                 }
-                hVaults.add(hVault);
+
+                BigInteger hashKey = new BigInteger(tokens[tokens.length - 1]);
+                hVaults.add(new FuzzyVault(hVault, hashKey));
             }
         }
 

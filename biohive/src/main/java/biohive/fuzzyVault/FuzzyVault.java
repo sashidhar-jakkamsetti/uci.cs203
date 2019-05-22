@@ -1,5 +1,6 @@
 package biohive.fuzzyVault;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ public class FuzzyVault
     private ArrayList<Minutiae> minutiaes;
     private IntegersZp64 field;
     private ArrayList<Tuple<Integer, Integer>> vault;
+    private BigInteger hashKey;
 
     public FuzzyVault(ArrayList<Minutiae> minutiaes)
     {
@@ -20,6 +22,13 @@ public class FuzzyVault
         this.minutiaes = new ArrayList<Minutiae>();
         this.minutiaes.addAll(minutiaes);
         vault = new ArrayList<Tuple<Integer, Integer>>();
+        hashKey = new BigInteger("-1");
+    }
+
+    public FuzzyVault(ArrayList<Tuple<Integer, Integer>> vault, BigInteger hashKey)
+    {
+        this.vault = vault;
+        this.hashKey = hashKey;
     }
 
     public boolean create()
@@ -48,12 +57,12 @@ public class FuzzyVault
     {
         ArrayList<Integer> key = new ArrayList<Integer>();
 
-        for(int i = 0; i < Constants.POLY_DEGREE; i++)
+        for(int i = 0; i < Constants.POLY_DEGREE + 1; i++)
         {
             key.add((int)field.randomElement());
         }
 
-        key.add((int)field.modulus(Utils.hashMe(key)));
+        hashKey = Utils.hashMe(key);
         return key;
     }
 
@@ -100,10 +109,16 @@ public class FuzzyVault
         return vault;
     }
 
+    public BigInteger getHashKey()
+    {
+        return hashKey;
+    }
+
     public FuzzyVault clone()
     {
         FuzzyVault newVault = new FuzzyVault(minutiaes);
         newVault.vault.addAll(this.vault);
+        newVault.hashKey = hashKey;
         return newVault;
     }
 }

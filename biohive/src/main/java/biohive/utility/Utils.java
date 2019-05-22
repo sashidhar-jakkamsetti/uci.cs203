@@ -7,6 +7,7 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.MD2Digest;
 
 import biohive.fuzzyVault.Tuple;
+import java.math.BigInteger;
 
 public class Utils
 {
@@ -15,7 +16,7 @@ public class Utils
         return (((1 << k) - 1) & (number >> (p - 1))); 
     }
 
-    public static int hashMe(ArrayList<Integer> keyMaterial)
+    public static BigInteger hashMe(ArrayList<Integer> keyMaterial)
     {
         if(keyMaterial.size() > 0) 
         {
@@ -27,10 +28,10 @@ public class Utils
                 digest.update(tokenBytes, 0, tokenBytes.length);
             }
             digest.doFinal(finValue, 0);
-            return toInt(finValue);
+            return new BigInteger(finValue);
         }
 
-        return -1;
+        return new BigInteger("-1");
     }
 
     private static byte[] toBytes(int i)
@@ -39,16 +40,6 @@ public class Utils
 
         result[0] = (byte) (i >> 8);
         result[1] = (byte) (i);
-
-        return result;
-    }
-
-    private static int toInt(byte[] byteArray)
-    {
-        int result = 0;
-
-        result = result | byteArray[1];
-        result = result << 8 | byteArray[0];
 
         return result;
     }

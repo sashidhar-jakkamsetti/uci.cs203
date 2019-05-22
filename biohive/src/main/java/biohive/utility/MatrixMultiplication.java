@@ -3,11 +3,10 @@ package biohive.utility;
 import cc.redberry.rings.IntegersZp64;
 
 public class MatrixMultiplication
-{
-    private static IntegersZp64 field = new IntegersZp64(Constants.FIELD_ORDER_16);
-    
-    public static int[][] multiply(int[][] A, int[][] B) 
+{    
+    public static int[][] multiply(int[][] A, int[][] B, Integer fieldOrder) 
     {
+        IntegersZp64 field = new IntegersZp64(Constants.FIELD_ORDER_16);
         int aRows = A.length;
         int aColumns = A[0].length;
         int bRows = B.length;
