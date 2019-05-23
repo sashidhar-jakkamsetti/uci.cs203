@@ -94,16 +94,23 @@ public class Authenticator
             }
         }
         
-        ModularMatrix xMat = new ModularMatrix(mat, Constants.FIELD_ORDER_16);
-        ModularMatrix inverseXMat = xMat.inverse(xMat);
         int[][] invMat = new int[Constants.POLY_DEGREE + 1][Constants.POLY_DEGREE + 1];
-
-        for (int i = 0; i < Constants.POLY_DEGREE + 1; i++) 
+        try
         {
-            for (int j = 0; j < Constants.POLY_DEGREE + 1; j++)
+            ModularMatrix xMat = new ModularMatrix(mat, Constants.FIELD_ORDER_16);
+            ModularMatrix inverseXMat = xMat.inverse(xMat);
+            
+            for (int i = 0; i < Constants.POLY_DEGREE + 1; i++) 
             {
-                invMat[i][j] = inverseXMat.getData()[i][j].intValue();
+                for (int j = 0; j < Constants.POLY_DEGREE + 1; j++)
+                {
+                    invMat[i][j] = inverseXMat.getData()[i][j].intValue();
+                }
             }
+        }
+        catch(Exception e)
+        {
+            return new ArrayList<Integer>();
         }
 
         int[][] coefficients = new int[Constants.POLY_DEGREE + 1][1];

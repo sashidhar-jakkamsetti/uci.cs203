@@ -48,18 +48,7 @@ public class MinutiaeMatcher
     { 
         public int compare(GenSet s1, GenSet s2) 
         { 
-            if (s1.avg < s2.avg) 
-            {
-                return 1; 
-            }
-            else if (s1.avg > s2.avg) 
-            {
-                return -1;           
-            }
-            else 
-            {
-                return 0; 
-            }
+            return s1.avg.compareTo(s2.avg);
         } 
     } 
 
@@ -88,7 +77,7 @@ public class MinutiaeMatcher
         }
 
         Object keyAtI = catalouge.keySet().toArray()[i];
-        newset.add(index,new Tuple<Integer, Double>((Integer)keyAtI,catalouge.get(keyAtI).y));
+        newset.add(index, new Tuple<Integer, Double>((Integer)keyAtI, catalouge.get(keyAtI).y));
      
         recurse(catalouge, n, r, index + 1, i + 1, newset);
         recurse(catalouge, n, r, index, i + 1, newset);
@@ -102,7 +91,7 @@ public class MinutiaeMatcher
         for(Tuple<Integer, Double> tuple : gs.topfive)
         {
             Tuple<Integer, Double> catalogueValue = catalouge.get(tuple.x);
-            returnVault.add(new Tuple<Integer, Integer>(tuple.x, vaultMap.get(catalogueValue.x)));
+            returnVault.add(new Tuple<Integer, Integer>(catalogueValue.x, vaultMap.get(catalogueValue.x)));
         }
 
         return returnVault;
@@ -110,9 +99,11 @@ public class MinutiaeMatcher
 
     private HashMap<Integer, Tuple<Integer, Double>> buildCatalouge()
     {
+        Integer matchCount = 0;
         for (Minutiae m : minutiaes) 
         {
             Double minScore = Double.MAX_VALUE;
+            Integer pointX = m.code;
             for (Tuple<Integer, Integer> point : vault.getVault()) 
             {
                 Minutiae vaultM = new Minutiae(point.x);
@@ -121,9 +112,18 @@ public class MinutiaeMatcher
                 if(score < minScore)
                 {
                     minScore = score;
+                    pointX = point.x;
                     catalouge.put(m.code, new Tuple<Integer, Double>(point.x, score));
                 }
             }
+
+            /* Debug code.
+            if(pointX.equals(m.code))
+            {
+                matchCount++;
+                System.out.println(m.code);
+            }
+            */
         }
 
         return catalouge;
