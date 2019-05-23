@@ -22,8 +22,10 @@ public class Constants
 
     public static final String DATABASE_BIO_FILENAME = "bio.db";
     public static final String DATABASE_HONEY_FILENAME = "honey.db";
+    
     public static final String ACTION_REGISTER = "reg";
     public static final String ACTION_AUTHENTICATE = "auth";
+    public static final String ACTION_ATTACK = "attack";
 
     public static final Integer ALARM_EXIT_STATUS = -1;
 }

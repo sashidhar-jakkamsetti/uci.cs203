@@ -9,11 +9,18 @@ import biohive.fuzzyVault.*;
 import biohive.honeywordGeneration.HoneywordGenerator;
 import biohive.minutiaeExtraction.*;
 import biohive.utility.*;
+import biohive.utility.Baseline.OpMode;
 
 public class biohive 
 {
     public static boolean run(Baseline bInfo)
     {
+        if(bInfo.mode == OpMode.attack)
+        {
+            File biometricDb = new File(bInfo.biodb);
+            // --> brute force: write code in BruteForce.java
+        }
+
         try 
         {
             System.out.println("Extracting minutiae from fingerprint image.");
@@ -32,7 +39,7 @@ public class biohive
                 ArrayList<Minutiae> minutiaes = MinutiaeExtractor.encode(targetFileName);
                 if(minutiaes.size() > 0)
                 {
-                    if(bInfo.mode)
+                    if(bInfo.mode == OpMode.reg)
                     {
                         System.out.println("Generating honey vaults.");
                         FuzzyVault sugarVault = new FuzzyVault(minutiaes);
@@ -56,7 +63,7 @@ public class biohive
                             }
                         }
                     }
-                    else
+                    else if(bInfo.mode == OpMode.auth)
                     {
                         System.out.println("Quering minutiae with userId: " + bInfo.userId);
                         ArrayList<FuzzyVault> hVaults = DatabaseIO.getHoneyVaults(bInfo.userId, bInfo.biodb);
@@ -110,13 +117,17 @@ public class biohive
 
         if(run(baselineInfo))
         {
-            if(baselineInfo.mode)
+            if(baselineInfo.mode == OpMode.reg)
             {
                 System.out.println("Biometric successfully registerd!");
             }
-            else
+            else if(baselineInfo.mode == OpMode.auth)
             {
                 System.out.println("Biometric successfully authenticated!");
+            }
+            else 
+            {
+                System.out.println("Biometric successfully attacked!");
             }
         }
         else

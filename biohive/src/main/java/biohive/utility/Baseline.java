@@ -6,13 +6,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="baseline")
 public class Baseline
 {
+    public enum OpMode
+    {
+        reg,
+        auth,
+        attack
+    }
+
     public String in_fingerprint;
     public String out_fingerprintAligned;
     public String out_minutiae;
     public String biodb;
     public String honeydb;
     public String userId;
-    public boolean mode;
+    public OpMode mode;
 
     String minutiae_extractor;
     String tarp_location;
@@ -148,11 +155,15 @@ public class Baseline
 
         if(action.equals(Constants.ACTION_REGISTER))
         {
-            mode = true;
+            mode = OpMode.reg;
+        }
+        else if(action.equals(Constants.ACTION_AUTHENTICATE))
+        {
+            mode = OpMode.auth;
         }
         else
         {
-            mode = false;
+            mode = OpMode.attack;
         }
     }
 }
