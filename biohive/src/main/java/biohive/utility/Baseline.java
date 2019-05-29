@@ -20,6 +20,7 @@ public class Baseline
     String fingerprint_raw;
     String fingerprint_aligned;
     String minutiae;
+    String minutiae_probdist;
     String database;
     String fingerprint;
     String action;
@@ -133,6 +134,17 @@ public class Baseline
     public void setClearDb(Boolean clearDb) 
     {
         this.clearDb = clearDb;
+    }
+
+    public String getMinutiae_probdist() 
+    {
+        return minutiae_probdist;
+    }
+
+    @XmlElement
+    public void setMnutiae_probdist(String minutiae_probdist) 
+    {
+        this.minutiae_probdist = minutiae_probdist;
     }
 
     public void prepareOutputIdentifiers()

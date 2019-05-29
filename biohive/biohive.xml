@@ -5,6 +5,7 @@
     <fingerprint_raw>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/fingerprint_raw/</fingerprint_raw>
     <fingerprint_aligned>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/fingerprint_aligned/</fingerprint_aligned>
     <minutiae>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/minutiae/</minutiae>
+    <minutiae_probdist>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/main/resources/minutiae_probdist.meta</minutiae_probdist>
     <database>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/</database>
     <fingerprint>101_6.tif</fingerprint>
     <action>auth</action>
