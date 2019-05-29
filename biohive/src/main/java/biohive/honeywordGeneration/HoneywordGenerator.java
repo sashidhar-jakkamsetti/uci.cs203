@@ -39,9 +39,9 @@ public class HoneywordGenerator
                 unlockedHVaults.put(i, hVault);
             }
         }
+        
         lock(unlockedHVaults);
         //honeyVaults.addAll(unlockedHVaults.values());
-
         return true;
     }
 

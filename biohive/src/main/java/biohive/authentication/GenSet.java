@@ -7,7 +7,7 @@ import biohive.fuzzyVault.Tuple;
 public class GenSet
 {
     public ArrayList<Tuple<Integer, Double>> topfive;
-    public double avg;
+    public Double avg;
     public int setNo;
 
     GenSet()

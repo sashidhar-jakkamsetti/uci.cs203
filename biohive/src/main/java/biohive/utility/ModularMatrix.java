@@ -73,7 +73,6 @@ public class ModularMatrix
         return ncols;
     }
 
-    // Take the transpose of the Matrix..
     public ModularMatrix transpose(ModularMatrix matrix) 
     {
         ModularMatrix transposedMatrix = new ModularMatrix(matrix.getNcols(), matrix.getNrows(), matrix.fieldOrder);
@@ -87,17 +86,14 @@ public class ModularMatrix
         return transposedMatrix;
     }
 
-    // All operations are using Big Integers... Not Modular of anything
     public BigInteger determinant(ModularMatrix matrix) 
     {
-
         if (matrix.size() == 1) 
         {
             return matrix.getValueAt(0, 0);
         }
         if (matrix.size() == 2) 
         {
-            //return (matrix.getValueAt(0, 0) * matrix.getValueAt(1, 1)) - (matrix.getValueAt(0, 1) * matrix.getValueAt(1, 0));
             return (matrix.getValueAt(0, 0).multiply(matrix.getValueAt(1, 1))).subtract((matrix.getValueAt(0, 1).multiply(matrix.getValueAt(1, 0))));
         }
         BigInteger sum = new BigInteger("0"); 
@@ -160,19 +156,27 @@ public class ModularMatrix
 
     public ModularMatrix inverse(ModularMatrix matrix) 
     {
-        return (transpose(cofactor(matrix)).dc(determinant(matrix)));
+        BigInteger det = determinant(matrix);
+        try
+        {
+            det = det.modInverse(mod);
+        }
+        catch(Exception e)
+        {}
+
+        return (transpose(cofactor(matrix)).dc(det));
     }
 
-    private ModularMatrix dc(BigInteger d) 
+    private ModularMatrix dc(BigInteger detInv) 
     {
-        BigInteger inv = d.modInverse(mod);
         for (int i = 0; i < nrows; i++) 
         {
             for (int j = 0; j < ncols; j++) 
             {
-                data[i][j] = (data[i][j].multiply(inv)).mod(mod); 
+                data[i][j] = (data[i][j].multiply(detInv)).mod(mod); 
             }
         }
+        
         return this;
     }
 }
