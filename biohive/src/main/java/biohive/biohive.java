@@ -6,7 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 import biohive.authentication.Authenticator;
 import biohive.fuzzyVault.*;
-import biohive.honeywordGeneration.HoneywordGenerator;
+import biohive.honeywordGeneration.HoneyMinutiae;
+import biohive.honeywordGeneration.HoneyvaultGenerator;
 import biohive.minutiaeExtraction.*;
 import biohive.utility.*;
 import biohive.utility.Baseline.OpMode;
@@ -45,7 +46,9 @@ public class biohive
                         FuzzyVault sugarVault = new FuzzyVault(minutiaes);
                         if(sugarVault.create())
                         {
-                            HoneywordGenerator hGenerator = new HoneywordGenerator(sugarVault);
+                            HoneyMinutiae hMinutiae = new HoneyMinutiae(bInfo.getMinutiae_probdist());
+
+                            HoneyvaultGenerator hGenerator = new HoneyvaultGenerator(sugarVault, hMinutiae);
                             if(hGenerator.generate())
                             {
                                 if(bInfo.getClearDb())
