@@ -3,7 +3,7 @@ package biohive.utility;
 public class Constants
 {
     public static final Integer NUMBER_OF_MINUTIAE = 15;
-    public static final Integer NUMBER_OF_CHAFF = 185;
+    public static final Integer NUMBER_OF_CHAFF = 200;
     
     public static final Integer BITS_OF_X_MINUTIAE = 9;
     public static final Integer CAP_BITS_OF_X_MINUTIAE = 5;
@@ -20,9 +20,8 @@ public class Constants
 
     public static final Integer NUMBER_OF_HONEY_VAULTS = 9;
 
-    public static final Double STD_DEV_1 = 0.65;
+    public static final Double STD_DEV_1 = 0.68;
     public static final Double STD_DEV_2 = 0.95;
-    public static final Double STD_DEV_3 = 1.0;
 
     public static final String DATABASE_BIO_FILENAME = "bio.db";
     public static final String DATABASE_HONEY_FILENAME = "honey.db";
