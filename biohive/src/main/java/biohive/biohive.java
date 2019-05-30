@@ -47,7 +47,6 @@ public class biohive
                         if(sugarVault.create())
                         {
                             HoneyMinutiae hMinutiae = new HoneyMinutiae(bInfo.getMinutiae_probdist());
-
                             HoneyvaultGenerator hGenerator = new HoneyvaultGenerator(sugarVault, hMinutiae);
                             if(hGenerator.generate())
                             {
@@ -71,7 +70,7 @@ public class biohive
                         System.out.println("Quering minutiae with userId: " + bInfo.userId);
                         ArrayList<FuzzyVault> hVaults = DatabaseIO.getHoneyVaults(bInfo.userId, bInfo.biodb);
 
-                        if(hVaults.size() == Constants.NUMBER_OF_HONEY_WORDS + 1)
+                        if(hVaults.size() == Constants.NUMBER_OF_HONEY_VAULTS + 1)
                         {
                             Authenticator authenticator = new Authenticator(bInfo.userId, hVaults, bInfo.honeydb);
                             return authenticator.authenticate(minutiaes);

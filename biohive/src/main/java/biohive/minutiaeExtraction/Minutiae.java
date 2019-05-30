@@ -47,6 +47,13 @@ public class Minutiae
         code = code | xShifted << Constants.CAP_BITS_OF_O_MINUTIAE + Constants.CAP_BITS_OF_Y_MINUTIAE;
     }
 
+    public void encodeNatural()
+    {
+        code = code | o;
+        code = code | y << Constants.CAP_BITS_OF_O_MINUTIAE;
+        code = code | x << Constants.CAP_BITS_OF_O_MINUTIAE + Constants.CAP_BITS_OF_Y_MINUTIAE;
+    }
+
     public void decode()
     {
         x = Utils.extractBits(

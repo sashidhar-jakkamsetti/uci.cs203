@@ -149,7 +149,7 @@ public class Baseline
     }
 
     @XmlElement
-    public void setMnutiae_probdist(String minutiae_probdist) 
+    public void setMinutiae_probdist(String minutiae_probdist) 
     {
         this.minutiae_probdist = minutiae_probdist;
     }
