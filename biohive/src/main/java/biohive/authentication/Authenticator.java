@@ -24,7 +24,7 @@ public class Authenticator
         this.honeydb = honeydb;
     }
     
-    public boolean authenticate(ArrayList<Minutiae> minutiaes) throws Exception
+    public Integer authenticate(ArrayList<Minutiae> minutiaes) throws Exception
     {
         ArrayList<Minutiae> redecodedMinutiaes = decodeMinutiae(minutiaes);
         
@@ -33,12 +33,12 @@ public class Authenticator
         {
             if(isSugarVault(vault, redecodedMinutiaes))
             {
-                return Validator.validate(userId, honeydb, idx);
+                return idx;
             }
             idx++;
         }
 
-        return false;
+        return -1;
     }
 
     private ArrayList<Minutiae> decodeMinutiae(ArrayList<Minutiae> minutiaes)

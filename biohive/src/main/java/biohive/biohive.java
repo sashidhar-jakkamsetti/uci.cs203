@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import biohive.attack.BruteForce;
+import biohive.attack.VaultGuessing;
 import biohive.authentication.Authenticator;
 import biohive.fuzzyVault.*;
 import biohive.honeywordGeneration.HoneyMinutiae;
@@ -11,72 +13,83 @@ import biohive.honeywordGeneration.HoneyvaultGenerator;
 import biohive.minutiaeExtraction.*;
 import biohive.utility.*;
 import biohive.utility.Baseline.OpMode;
+import biohive.validation.Validator;
 
 public class biohive 
 {
     public static boolean run(Baseline bInfo)
     {
-        if(bInfo.mode == OpMode.attack)
-        {
-            File biometricDb = new File(bInfo.biodb);
-            // --> brute force: write code in BruteForce.java
-        }
-
         try 
         {
-            System.out.println("Extracting minutiae from fingerprint image.");
-            String targetFileName = bInfo.out_minutiae + ".xyt";
-            File targetFile = new File(targetFileName);
-
-            if(!targetFile.exists())
+            if(bInfo.mode == OpMode.attack)
             {
-                MinutiaeExtractor.extract(bInfo);
-                TimeUnit.SECONDS.sleep(4);
+                ArrayList<FuzzyVault> hVaults = DatabaseIO.getHoneyVaults(bInfo.userId, bInfo.biodb);
+
+                VaultGuessing guessing = new VaultGuessing(hVaults);
+                FuzzyVault sugarVault = guessing.guess();
+
+                BruteForce bForce = new BruteForce();
+                ArrayList<Integer> key = bForce.bruteForce(sugarVault);
+
+                return Validator.validate(bInfo.userId, bInfo.honeydb, guessing.getSugarIdx());
             }
-
-            if(targetFile.exists())
+            else
             {
-                System.out.println("Encoding minutiae.");
-                ArrayList<Minutiae> minutiaes = MinutiaeExtractor.encode(targetFileName);
-                if(minutiaes.size() > 0)
-                {
-                    if(bInfo.mode == OpMode.reg)
-                    {
-                        System.out.println("Generating honey vaults.");
-                        FuzzyVault sugarVault = new FuzzyVault(minutiaes);
-                        if(sugarVault.create())
-                        {
-                            HoneyMinutiae hMinutiae = new HoneyMinutiae(bInfo.getMinutiae_probdist());
-                            HoneyvaultGenerator hGenerator = new HoneyvaultGenerator(sugarVault, hMinutiae);
-                            if(hGenerator.generate())
-                            {
-                                if(bInfo.getClearDb())
-                                {
-                                    System.out.println("Clearing the database.");
-                                    DatabaseIO.clearDb(bInfo.biodb);
-                                    DatabaseIO.clearDb(bInfo.honeydb);
-                                }
-
-                                System.out.println("Registering vaults with userId: " + bInfo.userId);
-                                DatabaseIO.setHoneyVaults(bInfo.userId, hGenerator.getHoneyVaults(), bInfo.biodb);
-                                DatabaseIO.setHoneyChecker(bInfo.userId, hGenerator.getHoneyChecker(), bInfo.honeydb);
+                System.out.println("Extracting minutiae from fingerprint image.");
+                String targetFileName = bInfo.out_minutiae + ".xyt";
+                File targetFile = new File(targetFileName);
     
-                                return true;
+                if(!targetFile.exists())
+                {
+                    MinutiaeExtractor.extract(bInfo);
+                    TimeUnit.SECONDS.sleep(4);
+                }
+    
+                if(targetFile.exists())
+                {
+                    System.out.println("Encoding minutiae.");
+                    ArrayList<Minutiae> minutiaes = MinutiaeExtractor.encode(targetFileName);
+                    if(minutiaes.size() > 0)
+                    {
+                        if(bInfo.mode == OpMode.reg)
+                        {
+                            System.out.println("Generating honey vaults.");
+                            FuzzyVault sugarVault = new FuzzyVault(minutiaes);
+                            if(sugarVault.create())
+                            {
+                                HoneyMinutiae hMinutiae = new HoneyMinutiae(bInfo.getMinutiae_probdist());
+                                HoneyvaultGenerator hGenerator = new HoneyvaultGenerator(sugarVault, hMinutiae);
+                                if(hGenerator.generate())
+                                {
+                                    if(bInfo.getClearDb())
+                                    {
+                                        System.out.println("Clearing the database.");
+                                        DatabaseIO.clearDb(bInfo.biodb);
+                                        DatabaseIO.clearDb(bInfo.honeydb);
+                                    }
+    
+                                    System.out.println("Registering vaults with userId: " + bInfo.userId);
+                                    DatabaseIO.setHoneyVaults(bInfo.userId, hGenerator.getHoneyVaults(), bInfo.biodb);
+                                    DatabaseIO.setHoneyChecker(bInfo.userId, hGenerator.getHoneyChecker(), bInfo.honeydb);
+        
+                                    return true;
+                                }
+                            }
+                        }
+                        else if(bInfo.mode == OpMode.auth)
+                        {
+                            System.out.println("Quering minutiae with userId: " + bInfo.userId);
+                            ArrayList<FuzzyVault> hVaults = DatabaseIO.getHoneyVaults(bInfo.userId, bInfo.biodb);
+    
+                            if(hVaults.size() == Constants.NUMBER_OF_HONEY_VAULTS + 1)
+                            {
+                                Authenticator authenticator = new Authenticator(bInfo.userId, hVaults, bInfo.honeydb);
+                                Integer sugarIdx = authenticator.authenticate(minutiaes);
+                                return Validator.validate(bInfo.userId, bInfo.honeydb, sugarIdx);
                             }
                         }
                     }
-                    else if(bInfo.mode == OpMode.auth)
-                    {
-                        System.out.println("Quering minutiae with userId: " + bInfo.userId);
-                        ArrayList<FuzzyVault> hVaults = DatabaseIO.getHoneyVaults(bInfo.userId, bInfo.biodb);
-
-                        if(hVaults.size() == Constants.NUMBER_OF_HONEY_VAULTS + 1)
-                        {
-                            Authenticator authenticator = new Authenticator(bInfo.userId, hVaults, bInfo.honeydb);
-                            return authenticator.authenticate(minutiaes);
-                        }
-                    }
-                }
+                }    
             }
 
             return false;
