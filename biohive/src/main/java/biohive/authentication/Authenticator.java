@@ -6,7 +6,6 @@ import java.math.BigInteger;
 import biohive.fuzzyVault.*;
 import biohive.minutiaeExtraction.Minutiae;
 import biohive.utility.*;
-import biohive.validation.Validator;
 import cc.redberry.rings.IntegersZp64;
 
 public class Authenticator

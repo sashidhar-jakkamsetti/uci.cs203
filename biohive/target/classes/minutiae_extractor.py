@@ -6,9 +6,9 @@ import numpy as np
 import sys
 
 def print_status(in_string):
-    print('\n==> Running ', end =" ")
+    print('\n==> Running ')
     for element in in_string:
-        print(element, end =" ")
+        print(element)
         
     return 0;
 
@@ -38,7 +38,7 @@ def extract_minutiae(tarp_loc, mindtct_loc, in_img, out_img, out_minutiae):
     print_status(run_mindtct)
     call(run_mindtct)
     
-    print("\n\nMinutiae extraction completed!", end='\n')
+    print("\n\nMinutiae extraction completed!")
     print("Please check %s.xyt for minutiae.\n" % out_minutiae)
 
     return 0;

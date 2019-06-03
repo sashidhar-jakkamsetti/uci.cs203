@@ -7,6 +7,6 @@ public class Alarm
     public static void shout()
     {
         System.out.println("Biometric database COMPROMISED!!");
-        System.exit(Constants.ALARM_EXIT_STATUS);
+        //System.exit(Constants.ALARM_EXIT_STATUS);
     }
 }
