@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -42,18 +43,18 @@ public class biohive {
                 }
 
                 if (targetFile.exists()) {
-                    System.out.println("Encoding minutiae.");
+                   // System.out.println("Encoding minutiae.");
                     ArrayList<Minutiae> minutiaes = MinutiaeExtractor.encode(targetFileName);
                     if (minutiaes.size() > 0) {
                         if (bInfo.mode == OpMode.reg) {
-                            System.out.println("Generating honey vaults.");
+                        //    System.out.println("Generating honey vaults.");
                             FuzzyVault sugarVault = new FuzzyVault(minutiaes);
                             if (sugarVault.create()) {
                                 HoneyMinutiae hMinutiae = new HoneyMinutiae(bInfo.getMinutiae_probdist());
                                 HoneyvaultGenerator hGenerator = new HoneyvaultGenerator(sugarVault, hMinutiae);
                                 if (hGenerator.generate()) {
                                     if (bInfo.getClearDb()) {
-                                        System.out.println("Clearing the database.");
+                        //                System.out.println("Clearing the database.");
                                         DatabaseIO.clearDb(bInfo.biodb);
                                         DatabaseIO.clearDb(bInfo.honeydb);
                                     }
@@ -94,13 +95,14 @@ public class biohive {
         PrintWriter writer;
         try {
             writer = new PrintWriter("C:\\Users\\Dell\\Desktop\\uci.cs203\\biohive\\output\\"+name+".txt", "UTF-8");
+            DecimalFormat numberFormat = new DecimalFormat("#.00");
             for(int i=0;i<data.size();i++)
             {
                 writer.print("DB "+(i+1)+": ");
                 ArrayList<Double> dataForDb = data.get(i);
                 for(Double d: dataForDb)
                 {
-                    writer.print(d+"  ");
+                    writer.print(numberFormat.format(d)+"  ");
                 }
                 writer.println();
             }
@@ -114,10 +116,11 @@ public class biohive {
         }
     }
 
-    public static void main(String[] args) 
+    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException 
     {
-        System.out.println("Initiating sequence.");
+        
 
+        DecimalFormat numberFormat = new DecimalFormat("#.00");
         String baselineFile;
         if(args.length > 0) 
         {
@@ -145,6 +148,11 @@ public class biohive {
         ArrayList<ArrayList<Double>> regTime_db = new ArrayList<ArrayList<Double>>();
         ArrayList<ArrayList<Double>> authTime_db = new ArrayList<ArrayList<Double>>();
     
+        ArrayList<Long> timesPerDb = new ArrayList<Long>();
+
+        long startTimeAnalysis = System.currentTimeMillis();
+
+
         for(int i=2;i<=2;i++) //1-4
         {
             File folder = new File("C:\\Users\\Dell\\Desktop\\uci.cs203\\biohive\\src\\database\\fingerprint\\DB"+i+"_B");
@@ -170,60 +178,96 @@ public class biohive {
                 // people.get(Integer.parseInt(a)-100).add(listOfFiles[j]);
             }
 
-            System.out.println("Number fo people here: "+people.size());
+            long startTimeDB = System.currentTimeMillis();
+            //PrintWriter writer = new PrintWriter("C:\\Users\\Dell\\Desktop\\uci.cs203\\biohive\\output\\log.txt", "UTF-8");
             for(int j=0;j<people.size();j++)  //people.size()
             {
-                System.out.println("Person "+j);
+                baselineInfo.userId = people.get(j).get(0).getName().split("_")[0];
                 ArrayList<File> person = people.get(j);
                 int insult=0;
                 
                 double regTime_person = 0;
                 double authTime_person = 0;
-                long startTimeReg;
-                long endTimeReg;
-                long startTimeAuth;
-                long endTimeAuth;
-
-                for(int k = 0; k<person.size(); k++)
-                {
-                    System.out.println("Registering " + k);
-                    // Registering user
-                    startTimeReg = System.currentTimeMillis();
-                    baselineInfo.setFingerprint(person.get(k).getName());
-                    baselineInfo.setAction("reg");
-                    run(baselineInfo);
-                    endTimeReg = System.currentTimeMillis();
-
-                    //Authenticating User
-                    startTimeAuth = System.currentTimeMillis();
-                    for(int l = 0; l<person.size(); l++)
+                
+                //for(int outer = 0; outer<10; outer++)
+                //{
+                    for(int k = 0; k<person.size(); k++)
                     {
-                        System.out.println("Auth "+l);
-                        if(l!=k)
-                        {
-                            baselineInfo.setFingerprint(person.get(l).getName());
-                            baselineInfo.setAction("attack");
-                            if(!run(baselineInfo)) insult++;
-                        } 
-                    }
-                    endTimeAuth = System.currentTimeMillis();
+                        // Registering user
+                        long startTimeReg = System.currentTimeMillis();
+                        baselineInfo.setFingerprint(person.get(k).getName());
+                        baselineInfo.mode = OpMode.reg;
+                        run(baselineInfo);
+                        long endTimeReg = System.currentTimeMillis();
 
-                    authTime_person += (endTimeAuth - startTimeAuth)/7.0; 
-                    regTime_person += (endTimeReg - startTimeReg);
-                   
-                }
-                insultRate.add(insult/8.0);
+                        //Authenticating User
+                        long startTimeAuth = System.currentTimeMillis();
+                        for(int l = 0; l<person.size(); l++)
+                        {
+                            System.out.println("Auth "+l);
+                            if(l!=k)
+                            {
+                                baselineInfo.setFingerprint(person.get(l).getName());
+                                baselineInfo.mode = OpMode.auth;
+                                if(!run(baselineInfo))
+                                {
+                                    //System.out.println("insult");
+                                    insult++;
+                                }
+                                {
+                                    //System.out.println("Authenticated");
+                                }
+                            } 
+                        }
+                        long endTimeAuth = System.currentTimeMillis();
+
+                        authTime_person += (endTimeAuth - startTimeAuth)/7.0; 
+                        regTime_person += (endTimeReg - startTimeReg);
+                    }
+                    
+                insultRate.add(insult/7.0);
                 regTime.add(regTime_person/8.0);
                 authTime.add(authTime_person/8.0);
+              //  }   
             }
+
+           // writer.close();
+
             insultRates_db.add(insultRate);
             regTime_db.add(regTime);
             authTime_db.add(authTime);
+            
+            long endTimeDB = System.currentTimeMillis();
+
+            timesPerDb.add(endTimeDB-startTimeDB);
         }
+
+        long endTimeAnalysis = System.currentTimeMillis();
 
         saveToFile(insultRates_db, "insultRates");
         saveToFile(regTime_db, "RegTimes");
         saveToFile(authTime_db, "AuthTimes");
+
+        PrintWriter writerTime;
+        try {
+            writerTime = new PrintWriter("C:\\Users\\Dell\\Desktop\\uci.cs203\\biohive\\output\\times.txt", "UTF-8");
+            for(int i=0;i<timesPerDb.size();i++)
+            {
+                writerTime.print("DB "+(i+1)+": "+numberFormat.format(timesPerDb.get(i))+"       ");
+            }
+            writerTime.println();
+            writerTime.print(numberFormat.format(endTimeAnalysis-startTimeAnalysis));
+            writerTime.close();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        System.out.println("done!!");
+    } 
 
         // if(run(baselineInfo))
         // {
@@ -244,5 +288,4 @@ public class biohive {
         // {
         //     System.out.println("Error occured!");
         // }
-    } 
 }
