@@ -214,6 +214,7 @@ public class biohive {
 
             FileWriter fr = new FileWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault/Analysis/degree/6/fr.txt", true);
             Double fraudratetot = 0.0;
+            Integer count = 0;
             for (String fingerString : bestFingerprints) 
             {
                 baselineInfo.setFingerprint(fingerString);
@@ -222,27 +223,51 @@ public class biohive {
                 run(baselineInfo);
                 
                 Integer fraud = 0;
-                for (String oFingerString : bestFingerprints) 
+                count = 0;
+                for (int i = 0; i < people.size(); i++) 
                 {
-                    if(!oFingerString.equals(fingerString))
+                    if(!people.get(i).get(0).getName().contains(baselineInfo.userId))
                     {
-                        baselineInfo.setFingerprint(oFingerString);
-                        baselineInfo.setAction("auth");
-                        baselineInfo.prepareOutputIdentifiers();
-
-                        if(!run(baselineInfo))
+                        for(int j = 0; j < people.get(i).size(); j++)
                         {
-                            System.out.println("expected");
+                            baselineInfo.setFingerprint(people.get(i).get(j).getName());
+                            baselineInfo.setAction("auth");
+                            baselineInfo.prepareOutputIdentifiers();
+                            count++;
+    
+                            if(!run(baselineInfo))
+                            {
+                                System.out.println("expected");
+                            }
+                            else 
+                            {
+                                System.out.println("fraud");
+                                fraud++;
+                            }
                         }
-                        else 
-                        {
-                            System.out.println("fraud");
-                            fraud++;
-                        }
-                    }    
+                    }
                 }
+                // for (String oFingerString : bestFingerprints) 
+                // {
+                //     if(!oFingerString.equals(fingerString))
+                //     {
+                //         baselineInfo.setFingerprint(oFingerString);
+                //         baselineInfo.setAction("auth");
+                //         baselineInfo.prepareOutputIdentifiers();
 
-                Double fraudrate = (Double)(fraud * 1.0/7.0);
+                //         if(!run(baselineInfo))
+                //         {
+                //             System.out.println("expected");
+                //         }
+                //         else 
+                //         {
+                //             System.out.println("fraud");
+                //             fraud++;
+                //         }
+                //     }    
+                // }
+
+                Double fraudrate = (Double)(fraud * 1.0/count);
                 fraudratetot += fraudrate;
                 fr.write("fr: " + fraudrate.toString() + "\n");
             }
