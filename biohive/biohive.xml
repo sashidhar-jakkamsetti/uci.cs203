@@ -1,19 +1,18 @@
 <baseline>
     <!-- resources -->
-    <minutiae_extractor>C:\Users\Dell\Desktop\uci.cs203\biohive\src\main\resources\minutiae_extractor.py</minutiae_extractor>
-    <tarp_location>C:\Users\Dell\Desktop\uci.cs203\biohive\src\main\resources\tarp.jar</tarp_location>
-    <mindtct_location>C:\Users\Dell\Desktop\uci.cs203\biohive\src\main\resources\mindtct</mindtct_location>
-    <minutiae_probdist>C:\Users\Dell\Desktop\uci.cs203\biohive\src\main\resources\minutiae_probdist.meta</minutiae_probdist>
+    <minutiae_extractor>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/main/resources/minutiae_extractor.py</minutiae_extractor>
+    <tarp_location>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/main/resources/tarp.jar</tarp_location>
+    <mindtct_location>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/main/resources/mindtct</mindtct_location>
+    <minutiae_probdist>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/main/resources/minutiae_probdist.meta</minutiae_probdist>
 
-    <!-- input\output locations -->
-    <fingerprint_raw>C:\Users\Dell\Desktop\uci.cs203\biohive\src\database\fingerprint\DB2_B\</fingerprint_raw>
-    <fingerprint_aligned>C:\Users\Dell\Desktop\uci.cs203\biohive\src\database\aligned\DB2_B\</fingerprint_aligned>
-    <minutiae>C:\Users\Dell\Desktop\uci.cs203\biohive\src\database\minutiae\DB2_B\</minutiae>
-    <database>C:\Users\Dell\Desktop\uci.cs203\biohive\src\database\</database>
+    <!-- input/output locations -->
+    <fingerprint_raw>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/fingerprint/DB2_B/</fingerprint_raw>
+    <fingerprint_aligned>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/aligned/DB2_B/</fingerprint_aligned>
+    <minutiae>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/minutiae/DB2_B/</minutiae>
+    <database>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/</database>
 
     <!-- current working configuration -->
     <fingerprint>101_7.tif</fingerprint>
     <action>reg</action>
     <clearDb>1</clearDb>
-    
 </baseline>

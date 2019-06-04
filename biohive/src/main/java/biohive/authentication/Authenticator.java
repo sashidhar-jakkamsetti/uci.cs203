@@ -63,11 +63,14 @@ public class Authenticator
         while(!mMatcher.isSetEmpty())
         {
             ArrayList<Tuple<Integer, Integer>> selectedVault = mMatcher.getNextSet();
-            ArrayList<Integer> predictedKey = solvePx(selectedVault);
-
-            if(verifyKey(predictedKey, vault.getHashKey()))
+            if(selectedVault.size() > 0)
             {
-                return true;
+                ArrayList<Integer> predictedKey = solvePx(selectedVault);
+
+                if(verifyKey(predictedKey, vault.getHashKey()))
+                {
+                    return true;
+                }
             }
         }
 

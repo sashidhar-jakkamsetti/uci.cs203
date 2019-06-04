@@ -16,6 +16,7 @@ public class MinutiaeMatcher
     private HashMap<Integer, Integer> vaultMap;
     private HashMap<Integer, Tuple<Integer, Double>> catalouge;
     private PriorityQueue<GenSet> queue;
+    private Integer queueSize = 0;
 
     public MinutiaeMatcher(FuzzyVault vault, ArrayList<Minutiae> minutiaes)
     {
@@ -30,6 +31,7 @@ public class MinutiaeMatcher
     {
         buildCatalouge();
         genQueue();
+        queueSize = queue.size();
         return;
     }
 
@@ -86,12 +88,19 @@ public class MinutiaeMatcher
     public ArrayList<Tuple<Integer, Integer>> getNextSet()
     {
         ArrayList<Tuple<Integer, Integer>> returnVault = new ArrayList<Tuple<Integer, Integer>>();
-        
-        GenSet gs = queue.poll();
-        for(Tuple<Integer, Double> tuple : gs.topfive)
+
+        if(queue.size() < queueSize * (0.80))
         {
-            Tuple<Integer, Double> catalogueValue = catalouge.get(tuple.x);
-            returnVault.add(new Tuple<Integer, Integer>(catalogueValue.x, vaultMap.get(catalogueValue.x)));
+            queue.clear();
+        }
+        else if(!queue.isEmpty())
+        {
+            GenSet gs = queue.poll();
+            for(Tuple<Integer, Double> tuple : gs.topfive)
+            {
+                Tuple<Integer, Double> catalogueValue = catalouge.get(tuple.x);
+                returnVault.add(new Tuple<Integer, Integer>(catalogueValue.x, vaultMap.get(catalogueValue.x)));
+            }
         }
 
         return returnVault;
