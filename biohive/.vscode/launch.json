@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "biohive",
+            "request": "launch",
+            "mainClass": "biohive.biohive",
+            "projectName": "biohive"
+        }
+    ]
+}

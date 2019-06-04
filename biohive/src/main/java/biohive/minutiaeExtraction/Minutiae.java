@@ -14,6 +14,11 @@ public class Minutiae
     public Minutiae()
     {}
 
+    public Minutiae(int code)
+    {
+        this.code = code;
+    }
+
     public Minutiae(int x, int y, int o, Integer cnf)
     {
         this.x = x;
@@ -31,7 +36,6 @@ public class Minutiae
         cnf = Integer.parseInt(tokens[3]);
     }
 
-    // Lossy encoding. We are reducing the precision of each value by BITS_OF_*_MINUTIAE - CAP_BITS_OF_*_MINUTIAE.
     public void encode()
     {
         int xShifted = x >> (Constants.BITS_OF_X_MINUTIAE - Constants.CAP_BITS_OF_X_MINUTIAE);
@@ -43,8 +47,13 @@ public class Minutiae
         code = code | xShifted << Constants.CAP_BITS_OF_O_MINUTIAE + Constants.CAP_BITS_OF_Y_MINUTIAE;
     }
 
-    // Since we already lossy encoded, it is impossbile to get the true values back. 
-    // So reconstructing the values with lower precision in terms of bits.
+    public void encodeNatural()
+    {
+        code = code | o;
+        code = code | y << Constants.CAP_BITS_OF_O_MINUTIAE;
+        code = code | x << Constants.CAP_BITS_OF_O_MINUTIAE + Constants.CAP_BITS_OF_Y_MINUTIAE;
+    }
+
     public void decode()
     {
         x = Utils.extractBits(
@@ -64,5 +73,10 @@ public class Minutiae
             Constants.CAP_BITS_OF_O_MINUTIAE,
             1
             );
+    }
+
+    public double distance(Minutiae m)
+    {
+        return Math.sqrt((Math.pow((x - m.x), 2) - Math.pow((y - m.y), 2))) + (0.3 * Math.min(Math.abs(o - m.o), 360 - Math.abs(o - m.o)));
     }
 }

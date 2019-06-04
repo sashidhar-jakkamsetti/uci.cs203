@@ -6,9 +6,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="baseline")
 public class Baseline
 {
+    public enum OpMode
+    {
+        reg,
+        auth,
+        attack
+    }
+
     public String in_fingerprint;
     public String out_fingerprintAligned;
     public String out_minutiae;
+    public String biodb;
+    public String honeydb;
+    public String userId;
+    public OpMode mode;
 
     String minutiae_extractor;
     String tarp_location;
@@ -16,7 +27,11 @@ public class Baseline
     String fingerprint_raw;
     String fingerprint_aligned;
     String minutiae;
+    String minutiae_probdist;
+    String database;
     String fingerprint;
+    String action;
+    Boolean clearDb;
 
     public String getMinutiae_extractor() 
     {
@@ -95,12 +110,72 @@ public class Baseline
         this.fingerprint = fingerprint;
     }
 
+    public String getDatabase() 
+    {
+        return database;
+    }
+
+    @XmlElement
+    public void setDatabase(String database) 
+    {
+        this.database = database;
+    }
+
+    public String getAction() 
+    {
+        return action;
+    }
+
+    @XmlElement
+    public void setAction(String action) 
+    {
+        this.action = action;
+    }
+
+    public Boolean getClearDb() 
+    {
+        return clearDb;
+    }
+
+    @XmlElement
+    public void setClearDb(Boolean clearDb) 
+    {
+        this.clearDb = clearDb;
+    }
+
+    public String getMinutiae_probdist() 
+    {
+        return minutiae_probdist;
+    }
+
+    @XmlElement
+    public void setMinutiae_probdist(String minutiae_probdist) 
+    {
+        this.minutiae_probdist = minutiae_probdist;
+    }
+
     public void prepareOutputIdentifiers()
     {
         String infileTag = fingerprint.replace(".tif", "").replace(".jpeg", "").replace(".png", "");
 
+        userId = infileTag.split("_")[0];
         in_fingerprint = String.format("%s/%s", fingerprint_raw, fingerprint);
         out_minutiae = String.format("%s/%s", minutiae, infileTag);
         out_fingerprintAligned = String.format("%s/%s.aligned.jpeg", fingerprint_aligned, infileTag);
+        biodb = String.format("%s%s", database, Constants.DATABASE_BIO_FILENAME);
+        honeydb = String.format("%s/%s", database, Constants.DATABASE_HONEY_FILENAME);
+
+        if(action.equals(Constants.ACTION_REGISTER))
+        {
+            mode = OpMode.reg;
+        }
+        else if(action.equals(Constants.ACTION_AUTHENTICATE))
+        {
+            mode = OpMode.auth;
+        }
+        else
+        {
+            mode = OpMode.attack;
+        }
     }
 }
