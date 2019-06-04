@@ -6,22 +6,17 @@ import java.math.BigInteger;
 import biohive.fuzzyVault.*;
 import biohive.minutiaeExtraction.Minutiae;
 import biohive.utility.*;
-import biohive.validation.Validator;
 import cc.redberry.rings.IntegersZp64;
 
 public class Authenticator
 {
     private ArrayList<FuzzyVault> hVaults;
-    private String userId;
-    private String honeydb;
     private IntegersZp64 field;
 
     public Authenticator(String userId, ArrayList<FuzzyVault> hVaults, String honeydb)
     {
         field = new IntegersZp64(Constants.FIELD_ORDER_16);
-        this.userId = userId;
         this.hVaults = hVaults;
-        this.honeydb = honeydb;
     }
     
     public Integer authenticate(ArrayList<Minutiae> minutiaes) throws Exception

@@ -7,12 +7,16 @@ import java.util.concurrent.TimeUnit;
 import biohive.attack.BruteForce;
 import biohive.attack.VaultGuessing;
 import biohive.authentication.Authenticator;
-import biohive.fuzzyVault.*;
-import biohive.honeywordGeneration.HoneyMinutiae;
-import biohive.honeywordGeneration.HoneyvaultGenerator;
-import biohive.minutiaeExtraction.*;
-import biohive.utility.*;
+import biohive.fuzzyVault.FuzzyVault;
+import biohive.honeyvaultGeneration.HoneyMinutiae;
+import biohive.honeyvaultGeneration.HoneyvaultGenerator;
+import biohive.minutiaeExtraction.Minutiae;
+import biohive.minutiaeExtraction.MinutiaeExtractor;
+import biohive.utility.Baseline;
 import biohive.utility.Baseline.OpMode;
+import biohive.utility.ConfigLoader;
+import biohive.utility.Constants;
+import biohive.utility.DatabaseIO;
 import biohive.validation.Validator;
 
 public class biohive 

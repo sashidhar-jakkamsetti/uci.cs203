@@ -1,4 +1,4 @@
-package biohive.honeywordGeneration;
+package biohive.honeyvaultGeneration;
 
 import java.util.ArrayList;
 import java.util.Collections;

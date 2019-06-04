@@ -99,11 +99,9 @@ public class MinutiaeMatcher
 
     private HashMap<Integer, Tuple<Integer, Double>> buildCatalouge()
     {
-        Integer matchCount = 0;
         for (Minutiae m : minutiaes) 
         {
             Double minScore = Double.MAX_VALUE;
-            Integer pointX = m.code;
             for (Tuple<Integer, Integer> point : vault.getVault()) 
             {
                 Minutiae vaultM = new Minutiae(point.x);
@@ -112,18 +110,9 @@ public class MinutiaeMatcher
                 if(score < minScore)
                 {
                     minScore = score;
-                    pointX = point.x;
                     catalouge.put(m.code, new Tuple<Integer, Double>(point.x, score));
                 }
             }
-
-            /* Debug code.
-            if(pointX.equals(m.code))
-            {
-                matchCount++;
-                System.out.println(m.code);
-            }
-            */
         }
 
         return catalouge;

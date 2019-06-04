@@ -13,6 +13,6 @@
 
     <!-- current working configuration -->
     <fingerprint>101_7.tif</fingerprint>
-    <action>attack</action>
+    <action>reg</action>
     <clearDb>1</clearDb>
 </baseline>
