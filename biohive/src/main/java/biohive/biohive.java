@@ -72,9 +72,11 @@ public class biohive {
                             ArrayList<FuzzyVault> hVaults = DatabaseIO.getHoneyVaults(bInfo.userId, bInfo.biodb);
 
                             if (hVaults.size() == Constants.NUMBER_OF_HONEY_VAULTS + 1) {
+                                System.out.println("something");
                                 Authenticator authenticator = new Authenticator(bInfo.userId, hVaults, bInfo.honeydb);
                                 Integer sugarIdx = authenticator.authenticate(minutiaes);
-                                return Validator.validate(bInfo.userId, bInfo.honeydb, sugarIdx);
+                                boolean blah = Validator.validate(bInfo.userId, bInfo.honeydb, sugarIdx);
+                                return blah;
                             }
                         }
                     }
@@ -118,8 +120,6 @@ public class biohive {
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException 
     {
-        
-
         DecimalFormat numberFormat = new DecimalFormat("#.00");
         String baselineFile;
         if(args.length > 0) 
@@ -143,15 +143,14 @@ public class biohive {
             e.printStackTrace();
             return;
         }
-
+       
         ArrayList<ArrayList<Double>> insultRates_db = new ArrayList<ArrayList<Double>>();
         ArrayList<ArrayList<Double>> regTime_db = new ArrayList<ArrayList<Double>>();
         ArrayList<ArrayList<Double>> authTime_db = new ArrayList<ArrayList<Double>>();
-    
+        ArrayList<ArrayList<Double>> fraudRates_db = new ArrayList<ArrayList<Double>>();
         ArrayList<Long> timesPerDb = new ArrayList<Long>();
 
         long startTimeAnalysis = System.currentTimeMillis();
-
 
         for(int i=2;i<=2;i++) //1-4
         {
@@ -161,6 +160,7 @@ public class biohive {
             ArrayList<Double> insultRate = new ArrayList<Double>();
             ArrayList<Double> regTime = new ArrayList<Double>();
             ArrayList<Double> authTime = new ArrayList<Double>();
+            ArrayList<Double> fraudRate = new ArrayList<Double>();
 
             ArrayList<ArrayList<File>> people = new ArrayList<ArrayList<File>>();
 
@@ -174,77 +174,72 @@ public class biohive {
                 }
 
                 people.add(people2);
-                // String a = listOfFiles[j].getName().split("_")[0];
-                // people.get(Integer.parseInt(a)-100).add(listOfFiles[j]);
             }
-
             long startTimeDB = System.currentTimeMillis();
-            //PrintWriter writer = new PrintWriter("C:\\Users\\Dell\\Desktop\\uci.cs203\\biohive\\output\\log.txt", "UTF-8");
+            
+            // FRAUD RATES START *******************************************************
             for(int j=0;j<people.size();j++)  //people.size()
             {
-                baselineInfo.userId = people.get(j).get(0).getName().split("_")[0];
                 ArrayList<File> person = people.get(j);
-                int insult=0;
+                baselineInfo.userId = person.get(0).getName().split("_")[0];
+                int fraud=0;
                 
                 double regTime_person = 0;
                 double authTime_person = 0;
-                
-                //for(int outer = 0; outer<10; outer++)
-                //{
-                    for(int k = 0; k<person.size(); k++)
+                for(int k = 0; k<person.size(); k++)
+                {
+                    // Registering user
+                    long startTimeReg = System.currentTimeMillis();
+                    baselineInfo.setFingerprint(person.get(k).getName());
+                    baselineInfo.mode = OpMode.reg;
+                    run(baselineInfo);
+                    long endTimeReg = System.currentTimeMillis();
+
+                    //Authenticating  other users
+                    long startTimeAuth = System.currentTimeMillis();
+                    for(int l = 0; l<people.size(); l++)
                     {
-                        // Registering user
-                        long startTimeReg = System.currentTimeMillis();
-                        baselineInfo.setFingerprint(person.get(k).getName());
-                        baselineInfo.mode = OpMode.reg;
-                        run(baselineInfo);
-                        long endTimeReg = System.currentTimeMillis();
-
-                        //Authenticating User
-                        long startTimeAuth = System.currentTimeMillis();
-                        for(int l = 0; l<person.size(); l++)
+                        if(l!=j)
                         {
-                            System.out.println("Auth "+l);
-                            if(l!=k)
+                            ArrayList<File> otherperson = people.get(l);
+                            for(File f: otherperson)
                             {
-                                baselineInfo.setFingerprint(person.get(l).getName());
+                                baselineInfo.setFingerprint(f.getName());
                                 baselineInfo.mode = OpMode.auth;
-                                if(!run(baselineInfo))
+                                if(run(baselineInfo))
                                 {
-                                    //System.out.println("insult");
-                                    insult++;
+                                    System.out.println("fraud");
+                                    fraud++;
                                 }
-                                {
-                                    //System.out.println("Authenticated");
-                                }
-                            } 
-                        }
-                        long endTimeAuth = System.currentTimeMillis();
-
-                        authTime_person += (endTimeAuth - startTimeAuth)/7.0; 
-                        regTime_person += (endTimeReg - startTimeReg);
+                            }
+                        } 
                     }
+                    long endTimeAuth = System.currentTimeMillis();
+
+                    authTime_person += (endTimeAuth - startTimeAuth)/7.0; 
+                    regTime_person += (endTimeReg - startTimeReg);
+                }
                     
-                insultRate.add(insult/7.0);
+                System.out.println("FRAUD                  "+fraud);
+                fraudRate.add(fraud/7.0);
                 regTime.add(regTime_person/8.0);
-                authTime.add(authTime_person/8.0);
-              //  }   
+                authTime.add(authTime_person/8.0);   
             }
 
-           // writer.close();
-
+            // FRAUD RATES END ************************************************************
             insultRates_db.add(insultRate);
+            fraudRates_db.add(fraudRate);
             regTime_db.add(regTime);
             authTime_db.add(authTime);
             
             long endTimeDB = System.currentTimeMillis();
-
             timesPerDb.add(endTimeDB-startTimeDB);
         }
 
         long endTimeAnalysis = System.currentTimeMillis();
 
         saveToFile(insultRates_db, "insultRates");
+        saveToFile(fraudRates_db, "fraudRates");
         saveToFile(regTime_db, "RegTimes");
         saveToFile(authTime_db, "AuthTimes");
 
@@ -268,6 +263,68 @@ public class biohive {
 
         System.out.println("done!!");
     } 
+
+
+
+    
+        /*    // INSULT RATES START ********************************************
+            for(int j=0;j<people.size();j++)  //people.size()
+            {
+                ArrayList<File> person = people.get(j);
+                baselineInfo.userId = person.get(0).getName().split("_")[0];
+                int insult=0;
+                
+                double regTime_person = 0;
+                double authTime_person = 0;
+                
+                //for(int outer = 0; outer<10; outer++)
+                //{
+                    for(int k = 0; k<person.size(); k++)
+                    {
+                        // Registering user
+                        long startTimeReg = System.currentTimeMillis();
+                        baselineInfo.setFingerprint(person.get(k).getName());
+                        baselineInfo.mode = OpMode.reg;
+                        System.out.println(baselineInfo.honeydb);
+                        run(baselineInfo);
+                        long endTimeReg = System.currentTimeMillis();
+
+                        //Authenticating User
+                        long startTimeAuth = System.currentTimeMillis();
+                        for(int l = 0; l<person.size(); l++)
+                        {
+                            System.out.println("Auth "+l);
+                            if(l!=k)
+                            {
+                                baselineInfo.setFingerprint(person.get(l).getName());
+                                baselineInfo.mode = OpMode.auth;
+                                if(!run(baselineInfo))
+                                {
+                                    System.out.println("insult");
+                                    insult++;
+                                }
+                                {
+                                    //System.out.println("Authenticated");
+                                }
+                            } 
+                        }
+                        long endTimeAuth = System.currentTimeMillis();
+
+                        authTime_person += (endTimeAuth - startTimeAuth)/7.0; 
+                        regTime_person += (endTimeReg - startTimeReg);
+                    }
+                    
+                System.out.println("INSULT                  "+insult);
+                insultRate.add(insult/7.0);
+                regTime.add(regTime_person/8.0);
+                authTime.add(authTime_person/8.0);
+              //  }   
+            }
+            
+            // INSULT RATES END ******************************* */
+
+
+
 
         // if(run(baselineInfo))
         // {

@@ -48,8 +48,8 @@ public class FuzzyVault
             unlockedVault.put(idx++, new Tuple<Integer, Integer>(chaff.x, chaff.y));
         }
 
-        lock(unlockedVault);
-        //vault.addAll(unlockedVault.values());
+       // lock(unlockedVault);
+        vault.addAll(unlockedVault.values());
         return true;
     }
 

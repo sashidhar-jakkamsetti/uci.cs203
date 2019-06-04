@@ -27,18 +27,18 @@ public class HoneyvaultGenerator
         HashMap<Integer, FuzzyVault> unlockedHVaults = new HashMap<Integer, FuzzyVault>();
         unlockedHVaults.put(0, sugarVault);
         
-        for(int i = 1; i < Constants.NUMBER_OF_HONEY_VAULTS + 1; i++) 
-        {
-            ArrayList<Minutiae> hMinutiaes = hMinutiae.generateGaussian();
-            FuzzyVault hVault = new FuzzyVault(hMinutiaes);
-            if(hVault.create())
-            {
-                unlockedHVaults.put(i, hVault);
-            }
-        }
+        // for(int i = 1; i < Constants.NUMBER_OF_HONEY_VAULTS + 1; i++) 
+        // {
+        //     ArrayList<Minutiae> hMinutiaes = hMinutiae.generateGaussian();
+        //     FuzzyVault hVault = new FuzzyVault(hMinutiaes);
+        //     if(hVault.create())
+        //     {
+        //         unlockedHVaults.put(i, hVault);
+        //     }
+        // }
         
-        lock(unlockedHVaults);
-        //honeyVaults.addAll(unlockedHVaults.values());
+        // lock(unlockedHVaults);
+        honeyVaults.addAll(unlockedHVaults.values());
         return true;
     }
 
