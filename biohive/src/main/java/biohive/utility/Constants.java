@@ -16,9 +16,9 @@ public class Constants
     public static final Integer FIELD_ORDER_5 = 31;
     public static final Integer FIELD_ORDER_6 = 61;
     public static final Integer FIELD_OREDER_NUM_OF_BYTES = 2;
-    public static final Integer POLY_DEGREE = 6; //
+    public static final Integer POLY_DEGREE = 4; //
 
-    public static final Integer NUMBER_OF_HONEY_VAULTS = 0;
+    public static final Integer NUMBER_OF_HONEY_VAULTS = 9;
 
     public static final Double STD_DEV_1 = 0.68;
     public static final Double STD_DEV_2 = 0.95;

@@ -1,13 +1,13 @@
 101
-insult rate   0.2857142857142857
+insult rate   0.0
 102
-insult rate   0.14285714285714285
+insult rate   0.0
 103
-insult rate   0.14285714285714285
+insult rate   0.25
 104
 insult rate   0.0
 105
-insult rate   0.42857142857142855
+insult rate   0.16666666666666666
 106
 insult rate   0.0
 107
@@ -15,8 +15,8 @@ insult rate   0.0
 108
 insult rate   0.42857142857142855
 109
-insult rate   0.14285714285714285
+insult rate   0.25
 110
-insult rate   0.42857142857142855
+insult rate   0.2857142857142857
 
-avg ir   0.2
+avg ir   0.1380952380952381

@@ -116,7 +116,7 @@ public class biohive {
         {
             ArrayList<String> bestFingerprints = new ArrayList<String>();
 
-            FileWriter ir = new FileWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault/Analysis/degree/6/ir.txt", true);
+            FileWriter ir = new FileWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault//ir.txt", true);
             String folderName = "/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/fingerprint/DB2_B";
     
             File folder = new File(folderName);
@@ -136,6 +136,28 @@ public class biohive {
                 }
 
                 people.add(people2);
+            }
+
+            for (int j = 0; j < people.size(); j++) 
+            {
+                for(int k = 0; k < people.get(j).size(); k++)
+                {
+                    baselineInfo.setFingerprint(people.get(j).get(k).getName());
+                    baselineInfo.setAction("reg");
+                    baselineInfo.prepareOutputIdentifiers();
+                    try 
+                    {
+                        ArrayList<Minutiae> minutiaes = MinutiaeExtractor.encode(baselineInfo.out_minutiae + ".xyt");
+                        if(minutiaes.size() < Constants.NUMBER_OF_MINUTIAE)
+                        {
+                            people.get(j).remove(people.get(j).get(k));
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        people.get(j).remove(people.get(j).get(k));
+                    }
+                }
             }
 
             Double insultRatetot = 0.0;
@@ -187,7 +209,7 @@ public class biohive {
                         } 
                     }
 
-                    Double insultrate = (Double)(insult * 1.0/7.0);
+                    Double insultrate = (Double)(insult * 1.0/person.size());
                     if(insultrate < personInsult)
                     {
                         personInsult = insultrate;
@@ -212,8 +234,9 @@ public class biohive {
             saveToFile(regTime, "RegTimes");
             saveToFile(authTime, "AuthTimes");
 
-            FileWriter fr = new FileWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault/Analysis/degree/6/fr.txt", true);
+            FileWriter fr = new FileWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault//fr.txt", true);
             Double fraudratetot = 0.0;
+            Integer count = 0;
             for (String fingerString : bestFingerprints) 
             {
                 baselineInfo.setFingerprint(fingerString);
@@ -222,27 +245,32 @@ public class biohive {
                 run(baselineInfo);
                 
                 Integer fraud = 0;
-                for (String oFingerString : bestFingerprints) 
+                count = 0;
+                for (int i = 0; i < people.size(); i++) 
                 {
-                    if(!oFingerString.equals(fingerString))
+                    if(!people.get(i).get(0).getName().contains(baselineInfo.userId))
                     {
-                        baselineInfo.setFingerprint(oFingerString);
-                        baselineInfo.setAction("auth");
-                        baselineInfo.prepareOutputIdentifiers();
-
-                        if(!run(baselineInfo))
+                        for(int j = 0; j < people.get(i).size(); j++)
                         {
-                            System.out.println("expected");
+                            baselineInfo.setFingerprint(people.get(i).get(j).getName());
+                            baselineInfo.setAction("auth");
+                            baselineInfo.prepareOutputIdentifiers();
+                            count++;
+    
+                            if(!run(baselineInfo))
+                            {
+                                System.out.println("expected");
+                            }
+                            else 
+                            {
+                                System.out.println("fraud");
+                                fraud++;
+                            }
                         }
-                        else 
-                        {
-                            System.out.println("fraud");
-                            fraud++;
-                        }
-                    }    
+                    }
                 }
 
-                Double fraudrate = (Double)(fraud * 1.0/7.0);
+                Double fraudrate = (Double)(fraud * 1.0/count);
                 fraudratetot += fraudrate;
                 fr.write("fr: " + fraudrate.toString() + "\n");
             }
@@ -250,7 +278,7 @@ public class biohive {
             fr.write("\n" + "avg fr   " + fraudratetot.toString() + "\n");
             fr.close();
         }
-        catch(Exception e){}
+        catch(Exception e){System.out.println("not done!!");}
         System.out.println("done!!");
     } 
 
@@ -260,7 +288,7 @@ public class biohive {
         PrintWriter writer;
         try 
         {
-            writer = new PrintWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault/Analysis/degree/6/"+name+".txt", "UTF-8");
+            writer = new PrintWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault//"+name+".txt", "UTF-8");
             Double avg = 0.0;
             for(Double d: data)
             {

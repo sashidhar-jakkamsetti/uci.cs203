@@ -1,0 +1,22 @@
+101
+insult rate   0.25
+102
+insult rate   0.0
+103
+insult rate   0.5
+104
+insult rate   0.0
+105
+insult rate   0.3333333333333333
+106
+insult rate   0.125
+107
+insult rate   0.0
+108
+insult rate   0.7142857142857143
+109
+insult rate   0.375
+110
+insult rate   0.7142857142857143
+
+avg ir   0.3011904761904762
