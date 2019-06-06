@@ -269,7 +269,6 @@ public class biohive {
                         }
                     }
                 }
-
                 Double fraudrate = (Double)(fraud * 1.0/count);
                 fraudratetot += fraudrate;
                 fr.write("fr: " + fraudrate.toString() + "\n");
