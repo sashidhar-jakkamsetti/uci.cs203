@@ -33,8 +33,8 @@ public class BruteForce
             qMinutiaes.add(m);  
         }
 
-        MinutiaeMatcher mMatcher = new MinutiaeMatcher(vault, qMinutiaes);
-        mMatcher.initialize();
+        MinutiaeMatcher mMatcher = new MinutiaeMatcher(vault, qMinutiaes, 1.0);
+        mMatcher.initialize(true);
 
         int guessCounter = 0;
         while(!mMatcher.isSetEmpty())

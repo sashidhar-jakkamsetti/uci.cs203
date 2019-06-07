@@ -17,21 +17,27 @@ public class MinutiaeMatcher
     private HashMap<Integer, Tuple<Integer, Double>> catalouge;
     private PriorityQueue<GenSet> queue;
     private Integer queueSize = 0;
+    private Double reqSize;
 
-    public MinutiaeMatcher(FuzzyVault vault, ArrayList<Minutiae> minutiaes)
+    public MinutiaeMatcher(FuzzyVault vault, ArrayList<Minutiae> minutiaes, Double reqSize)
     {
         this.vault = vault;
         this.minutiaes = minutiaes;
         vaultMap = Utils.convertToMap(vault.getVault());
         catalouge = new HashMap<Integer, Tuple<Integer, Double>>();
         queue = new PriorityQueue<GenSet>(new SetComparator());
+        this.reqSize = reqSize;
     }
 
-    public void initialize()
+    public void initialize(Boolean buildQueue)
     {
         buildCatalouge();
-        genQueue();
-        queueSize = queue.size();
+
+        if(buildQueue)
+        {
+            genQueue();
+            queueSize = queue.size();
+        }
         return;
     }
 
@@ -85,11 +91,23 @@ public class MinutiaeMatcher
         recurse(catalouge, n, r, index, i + 1, newset);
     }
 
+    public Double getClosenessScore() 
+    {
+        Double aggregateScore = 0.0;
+
+        for (Tuple<Integer, Double> item : catalouge.values()) 
+        {  
+            aggregateScore += item.y;
+        }
+
+        return aggregateScore / catalouge.size();
+    }
+
     public ArrayList<Tuple<Integer, Integer>> getNextSet()
     {
         ArrayList<Tuple<Integer, Integer>> returnVault = new ArrayList<Tuple<Integer, Integer>>();
 
-        if(queue.size() < queueSize * (0.80))
+        if(queue.size() < queueSize * reqSize)
         {
             queue.clear();
         }

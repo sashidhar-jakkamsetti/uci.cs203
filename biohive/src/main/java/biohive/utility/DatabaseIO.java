@@ -43,6 +43,7 @@ public class DatabaseIO
         BufferedReader bReader = new BufferedReader(new FileReader(inFilename));
         
         String line;
+        int id = 0;
         while ((line = bReader.readLine()) != null) 
         {
             String[] tokens = line.split(" ");
@@ -55,7 +56,7 @@ public class DatabaseIO
                 }
 
                 BigInteger hashKey = new BigInteger(tokens[tokens.length - 1]);
-                hVaults.add(new FuzzyVault(hVault, hashKey));
+                hVaults.add(new FuzzyVault(hVault, hashKey, id++));
             }
         }
 

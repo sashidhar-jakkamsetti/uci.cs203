@@ -11,30 +11,28 @@ import cc.redberry.rings.IntegersZp64;
 public class Authenticator
 {
     private ArrayList<FuzzyVault> hVaults;
-    private String userId;
-    private String honeydb;
     private IntegersZp64 field;
+    private PriorityQueue<Tuple<FuzzyVault, Double>> sortedVaults;
 
     public Authenticator(String userId, ArrayList<FuzzyVault> hVaults, String honeydb)
     {
         field = new IntegersZp64(Constants.FIELD_ORDER_16);
-        this.userId = userId;
         this.hVaults = hVaults;
-        this.honeydb = honeydb;
+        sortedVaults = new PriorityQueue<Tuple<FuzzyVault, Double>>(new VaultComparator());
     }
     
     public Integer authenticate(ArrayList<Minutiae> minutiaes) throws Exception
     {
         ArrayList<Minutiae> redecodedMinutiaes = decodeMinutiae(minutiaes);
-        
-        Integer idx = 0;
-        for ( FuzzyVault vault : hVaults) 
+        prepareVaultSet(redecodedMinutiaes);
+    
+        while(sortedVaults.size() >= (Constants.NUMBER_OF_HONEY_VAULTS + 1) * Constants.HIVE_CHECK_SET)
         {
-            if(isSugarVault(vault, redecodedMinutiaes))
+            Tuple<FuzzyVault, Double> cVault = sortedVaults.poll();
+            if(isSugarVault(cVault.x, redecodedMinutiaes))
             {
-                return idx;
+                return cVault.x.getId();
             }
-            idx++;
         }
 
         return -1;
@@ -55,10 +53,29 @@ public class Authenticator
         return newMinutiaes;
     }
 
+    class VaultComparator implements Comparator<Tuple<FuzzyVault, Double>>
+    { 
+        public int compare(Tuple<FuzzyVault, Double> v1, Tuple<FuzzyVault, Double> v2) 
+        { 
+            return v1.y.compareTo(v2.y);
+        } 
+    } 
+
+    private void prepareVaultSet(ArrayList<Minutiae> minutiaes)
+    {
+        for (FuzzyVault vault : hVaults) 
+        {
+            MinutiaeMatcher mm = new MinutiaeMatcher(vault, minutiaes, 0.0);
+            mm.initialize(false);
+            Double score = mm.getClosenessScore();
+            sortedVaults.add(new Tuple<FuzzyVault, Double>(vault, score));
+        }
+    }
+
     private boolean isSugarVault(FuzzyVault vault, ArrayList<Minutiae> minutiaes)
     {
-        MinutiaeMatcher mMatcher = new MinutiaeMatcher(vault, minutiaes);
-        mMatcher.initialize();
+        MinutiaeMatcher mMatcher = new MinutiaeMatcher(vault, minutiaes, Constants.VAULT_CHECK_SET);
+        mMatcher.initialize(true);
 
         while(!mMatcher.isSetEmpty())
         {

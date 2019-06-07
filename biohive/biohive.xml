@@ -12,7 +12,7 @@
     <database>/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/</database>
 
     <!-- current working configuration -->
-    <fingerprint>101_7.tif</fingerprint>
+    <fingerprint>101_1.tif</fingerprint>
     <action>reg</action>
     <clearDb>1</clearDb>
 </baseline>

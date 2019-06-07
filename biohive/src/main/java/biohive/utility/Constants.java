@@ -12,6 +12,8 @@ public class Constants
     public static final Integer BITS_OF_O_MINUTIAE = 9;
     public static final Integer CAP_BITS_OF_O_MINUTIAE = 6;
 
+    public static final Integer CAP_MINUTIAE_QUALITY = 29;
+
     public static final Integer FIELD_ORDER_16 = 65537;
     public static final Integer FIELD_ORDER_5 = 31;
     public static final Integer FIELD_ORDER_6 = 61;
@@ -22,6 +24,9 @@ public class Constants
 
     public static final Double STD_DEV_1 = 0.68;
     public static final Double STD_DEV_2 = 0.95;
+
+    public static final Double VAULT_CHECK_SET = 0.85;
+    public static final Double HIVE_CHECK_SET = 0.5;
 
     public static final String DATABASE_BIO_FILENAME = "bio.db";
     public static final String DATABASE_HONEY_FILENAME = "honey.db";

@@ -87,8 +87,9 @@ public class biohive {
         return false;
     }
 
-    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException 
+    public static void main(String[] args) throws Exception 
     {
+        Boolean analysisMode = true;
         String baselineFile;
         if(args.length > 0) 
         {
@@ -112,182 +113,203 @@ public class biohive {
             return;
         }
 
-        try 
+        if(!analysisMode && run(baselineInfo))
         {
-            ArrayList<String> bestFingerprints = new ArrayList<String>();
-
-            FileWriter ir = new FileWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault//ir.txt", true);
-            String folderName = "/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/fingerprint/DB2_B";
-    
-            File folder = new File(folderName);
-            File[] listOfFiles = folder.listFiles();
-            Arrays.sort(listOfFiles);
-
-            ArrayList<Double> regTime = new ArrayList<Double>();
-            ArrayList<Double> authTime = new ArrayList<Double>();
-
-            ArrayList<ArrayList<File>> people = new ArrayList<ArrayList<File>>();
-            for (int j = 0; j < listOfFiles.length; j+=8) {
-
-                ArrayList<File> people2 = new ArrayList<File>();
-                for(int k = j; k < j+8; k++)
-                {
-                    people2.add(listOfFiles[k]);
-                }
-
-                people.add(people2);
-            }
-
-            for (int j = 0; j < people.size(); j++) 
+            if(baselineInfo.mode == OpMode.reg)
             {
-                for(int k = 0; k < people.get(j).size(); k++)
-                {
-                    baselineInfo.setFingerprint(people.get(j).get(k).getName());
-                    baselineInfo.setAction("reg");
-                    baselineInfo.prepareOutputIdentifiers();
-                    try 
+                System.out.println("Biometric successfully registerd!");
+            }
+            else if(baselineInfo.mode == OpMode.auth)
+            {
+                System.out.println("Biometric successfully authenticated!");
+            }
+            else 
+            {
+                System.out.println("Biometric successfully attacked!");
+            }
+        }
+        else if(!analysisMode)
+        {
+            System.out.println("Error occured!");
+        }
+        else
+        {
+            try 
+            {
+                ArrayList<String> bestFingerprints = new ArrayList<String>();
+    
+                FileWriter ir = new FileWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault/optimized//ir.txt", true);
+                String folderName = "/home/sashidhar/course-work/cs203/uci.cs203/biohive/src/database/fingerprint/DB2_B";
+        
+                File folder = new File(folderName);
+                File[] listOfFiles = folder.listFiles();
+                Arrays.sort(listOfFiles);
+    
+                ArrayList<Double> regTime = new ArrayList<Double>();
+                ArrayList<Double> authTime = new ArrayList<Double>();
+    
+                ArrayList<ArrayList<File>> people = new ArrayList<ArrayList<File>>();
+                for (int j = 0; j < listOfFiles.length; j+=8) {
+    
+                    ArrayList<File> people2 = new ArrayList<File>();
+                    for(int k = j; k < j+8; k++)
                     {
-                        ArrayList<Minutiae> minutiaes = MinutiaeExtractor.encode(baselineInfo.out_minutiae + ".xyt");
-                        if(minutiaes.size() < Constants.NUMBER_OF_MINUTIAE)
+                        people2.add(listOfFiles[k]);
+                    }
+    
+                    people.add(people2);
+                }
+    
+                for (int j = 0; j < people.size(); j++) 
+                {
+                    for(int k = 0; k < people.get(j).size(); k++)
+                    {
+                        baselineInfo.setFingerprint(people.get(j).get(k).getName());
+                        baselineInfo.setAction("reg");
+                        baselineInfo.prepareOutputIdentifiers();
+                        try 
+                        {
+                            ArrayList<Minutiae> minutiaes = MinutiaeExtractor.encode(baselineInfo.out_minutiae + ".xyt");
+                            if(minutiaes.size() < Constants.NUMBER_OF_MINUTIAE)
+                            {
+                                people.get(j).remove(people.get(j).get(k));
+                            }
+                        }
+                        catch(Exception e)
                         {
                             people.get(j).remove(people.get(j).get(k));
                         }
                     }
-                    catch(Exception e)
-                    {
-                        people.get(j).remove(people.get(j).get(k));
-                    }
                 }
-            }
-
-            Double insultRatetot = 0.0;
-            for(int j=0;j<people.size();j++)  
-            {
-                Double personInsult = 1.0;
-
-                baselineInfo.userId = people.get(j).get(0).getName().split("_")[0];
-                ArrayList<File> person = people.get(j);
-                
-                ir.write(baselineInfo.userId + "\n");
-                double regTime_person = 0;
-                double authTime_person = 0;
-                String bestfingerprint = "";
-                for(int k = 0; k<person.size(); k++)
+    
+                Double insultRatetot = 0.0;
+                for(int j=0;j<people.size();j++)  
                 {
-                    Integer insult=0;
-                    baselineInfo.setFingerprint(person.get(k).getName());
+                    Double personInsult = 1.0;
+    
+                    baselineInfo.userId = people.get(j).get(0).getName().split("_")[0];
+                    ArrayList<File> person = people.get(j);
+                    
+                    ir.write(baselineInfo.userId + "\n");
+                    double regTime_person = 0;
+                    double authTime_person = 0;
+                    String bestfingerprint = "";
+                    for(int k = 0; k<person.size(); k++)
+                    {
+                        Integer insult=0;
+                        baselineInfo.setFingerprint(person.get(k).getName());
+                        baselineInfo.setAction("reg");
+                        baselineInfo.prepareOutputIdentifiers();
+    
+                        long startTimeReg = System.currentTimeMillis();
+                        run(baselineInfo);
+                        long endTimeReg = System.currentTimeMillis();
+    
+                        long startTimeAuth = System.currentTimeMillis();
+                        long endTimeAuth = System.currentTimeMillis();
+                        for(int l = 0; l<person.size(); l++)
+                        {
+                            if(l!=k)
+                            {
+                                baselineInfo.setFingerprint(person.get(l).getName());
+                                baselineInfo.setAction("auth");
+                                baselineInfo.prepareOutputIdentifiers();
+    
+                                startTimeAuth = System.currentTimeMillis();
+                                if(!run(baselineInfo))
+                                {
+                                    endTimeAuth = System.currentTimeMillis();
+                                    System.out.println("insult");
+                                    insult++;
+                                }
+                                else 
+                                {
+                                    endTimeAuth = System.currentTimeMillis();
+                                    System.out.println("authenticated");
+                                }
+                            } 
+                        }
+    
+                        Double insultrate = (Double)(insult * 1.0/person.size());
+                        if(insultrate < personInsult)
+                        {
+                            personInsult = insultrate;
+                            bestfingerprint = person.get(k).getName();
+                        }
+    
+                        authTime_person += (endTimeAuth - startTimeAuth); 
+                        regTime_person += (endTimeReg - startTimeReg);
+                    }
+    
+                    bestFingerprints.add(bestfingerprint);
+    
+                    regTime.add(regTime_person/person.size()*1.0);
+                    authTime.add(authTime_person/person.size()*1.0);
+                    ir.write("insult rate   " + personInsult.toString() + "\n");
+                    insultRatetot += personInsult;
+                }
+                insultRatetot = insultRatetot/people.size()*1.0;
+                ir.write("\n" + "avg ir   " + insultRatetot.toString() + "\n");
+                ir.close();
+    
+                saveToFile(regTime, "RegTimes");
+                saveToFile(authTime, "AuthTimes");
+    
+                FileWriter fr = new FileWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault/optimized//fr.txt", true);
+                Double fraudratetot = 0.0;
+                Integer count = 0;
+                for (String fingerString : bestFingerprints) 
+                {
+                    baselineInfo.setFingerprint(fingerString);
                     baselineInfo.setAction("reg");
                     baselineInfo.prepareOutputIdentifiers();
-
-                    long startTimeReg = System.currentTimeMillis();
                     run(baselineInfo);
-                    long endTimeReg = System.currentTimeMillis();
-
-                    long startTimeAuth = System.currentTimeMillis();
-                    long endTimeAuth = System.currentTimeMillis();
-                    for(int l = 0; l<person.size(); l++)
+                    
+                    Integer fraud = 0;
+                    count = 0;
+                    for (int i = 0; i < people.size(); i++) 
                     {
-                        System.out.println("Auth "+l);
-                        if(l!=k)
+                        if(!people.get(i).get(0).getName().contains(baselineInfo.userId))
                         {
-                            baselineInfo.setFingerprint(person.get(l).getName());
-                            baselineInfo.setAction("auth");
-                            baselineInfo.prepareOutputIdentifiers();
-
-                            startTimeAuth = System.currentTimeMillis();
-                            if(!run(baselineInfo))
+                            for(int j = 0; j < people.get(i).size(); j++)
                             {
-                                endTimeAuth = System.currentTimeMillis();
-                                System.out.println("insult");
-                                insult++;
-                            }
-                            else 
-                            {
-                                endTimeAuth = System.currentTimeMillis();
-                                System.out.println("authenticated");
-                            }
-                        } 
-                    }
-
-                    Double insultrate = (Double)(insult * 1.0/person.size());
-                    if(insultrate < personInsult)
-                    {
-                        personInsult = insultrate;
-                        bestfingerprint = person.get(k).getName();
-                    }
-
-                    authTime_person += (endTimeAuth - startTimeAuth); 
-                    regTime_person += (endTimeReg - startTimeReg);
-                }
-
-                bestFingerprints.add(bestfingerprint);
-
-                regTime.add(regTime_person/person.size()*1.0);
-                authTime.add(authTime_person/person.size()*1.0);
-                ir.write("insult rate   " + personInsult.toString() + "\n");
-                insultRatetot += personInsult;
-            }
-            insultRatetot = insultRatetot/people.size()*1.0;
-            ir.write("\n" + "avg ir   " + insultRatetot.toString() + "\n");
-            ir.close();
-
-            saveToFile(regTime, "RegTimes");
-            saveToFile(authTime, "AuthTimes");
-
-            FileWriter fr = new FileWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault//fr.txt", true);
-            Double fraudratetot = 0.0;
-            Integer count = 0;
-            for (String fingerString : bestFingerprints) 
-            {
-                baselineInfo.setFingerprint(fingerString);
-                baselineInfo.setAction("reg");
-                baselineInfo.prepareOutputIdentifiers();
-                run(baselineInfo);
-                
-                Integer fraud = 0;
-                count = 0;
-                for (int i = 0; i < people.size(); i++) 
-                {
-                    if(!people.get(i).get(0).getName().contains(baselineInfo.userId))
-                    {
-                        for(int j = 0; j < people.get(i).size(); j++)
-                        {
-                            baselineInfo.setFingerprint(people.get(i).get(j).getName());
-                            baselineInfo.setAction("auth");
-                            baselineInfo.prepareOutputIdentifiers();
-                            count++;
-    
-                            if(!run(baselineInfo))
-                            {
-                                System.out.println("expected");
-                            }
-                            else 
-                            {
-                                System.out.println("fraud");
-                                fraud++;
+                                baselineInfo.setFingerprint(people.get(i).get(j).getName());
+                                baselineInfo.setAction("auth");
+                                baselineInfo.prepareOutputIdentifiers();
+                                count++;
+        
+                                if(!run(baselineInfo))
+                                {
+                                    System.out.println("expected");
+                                }
+                                else 
+                                {
+                                    System.out.println("fraud");
+                                    fraud++;
+                                }
                             }
                         }
                     }
+                    Double fraudrate = (Double)(fraud * 1.0/count);
+                    fraudratetot += fraudrate;
+                    fr.write("fr: " + fraudrate.toString() + "\n");
                 }
-                Double fraudrate = (Double)(fraud * 1.0/count);
-                fraudratetot += fraudrate;
-                fr.write("fr: " + fraudrate.toString() + "\n");
+                fraudratetot = fraudratetot/bestFingerprints.size()*1.0;
+                fr.write("\n" + "avg fr   " + fraudratetot.toString() + "\n");
+                fr.close();
             }
-            fraudratetot = fraudratetot/bestFingerprints.size()*1.0;
-            fr.write("\n" + "avg fr   " + fraudratetot.toString() + "\n");
-            fr.close();
-        }
-        catch(Exception e){System.out.println("not done!!");}
-        System.out.println("done!!");
-    } 
-
+            catch(Exception e){System.out.println("not done!!");}
+            System.out.println("done!!");
+        } 
+        
+    }
 
     static void saveToFile(ArrayList<Double> data, String name)
     {
         PrintWriter writer;
         try 
         {
-            writer = new PrintWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault//"+name+".txt", "UTF-8");
+            writer = new PrintWriter("/home/sashidhar/course-work/cs203/uci.cs203/biohive/honeyvault/optimized//"+name+".txt", "UTF-8");
             Double avg = 0.0;
             for(Double d: data)
             {

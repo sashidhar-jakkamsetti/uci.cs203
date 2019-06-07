@@ -15,6 +15,7 @@ public class FuzzyVault
     private IntegersZp64 field;
     private ArrayList<Tuple<Integer, Integer>> vault;
     private BigInteger hashKey;
+    private Integer id = 0;
 
     public FuzzyVault(ArrayList<Minutiae> minutiaes)
     {
@@ -25,8 +26,9 @@ public class FuzzyVault
         hashKey = new BigInteger("-1");
     }
 
-    public FuzzyVault(ArrayList<Tuple<Integer, Integer>> vault, BigInteger hashKey)
+    public FuzzyVault(ArrayList<Tuple<Integer, Integer>> vault, BigInteger hashKey, Integer id)
     {
+        this.id = id;
         this.vault = vault;
         this.hashKey = hashKey;
     }
@@ -121,6 +123,9 @@ public class FuzzyVault
         newVault.hashKey = hashKey;
         return newVault;
     }
-    
-    //testing - surmeet
+
+    public Integer getId()
+    {
+        return id;
+    }
 }
